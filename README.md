@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Meta Ads Connect — Hackathon MVP
 
-## Getting Started
+Native adtech: automate creator outreach. Businesses build campaigns (Ads Manager style), creators get offers/bids to accept/reject.
 
-First, run the development server:
+## Run demo (no backend, 30s)
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# open http://localhost:3000
+# /business = SME dashboard, /creator = creator inbox
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Demo data is in-memory (`src/lib/demo-data.ts`), matching score in `src/lib/matching.ts`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Connect Supabase (your task, ~10 min)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Go to https://supabase.com/dashboard → New project (free tier, region closest to you).
+2. Wait for provisioning → go to **SQL Editor → New query**.
+3. Paste entire contents of `supabase/schema.sql` → **Run**. Should say success, 3 tables + policies + realtime.
+4. Go to **Project Settings → API**: copy `Project URL` + `anon public` key.
+5. Locally:
+   ```bash
+   cp .env.example .env.local
+   # edit .env.local with your URL + ANON key
+   npm run dev
+   ```
+6. (Next step for me) Once you paste your URL here / confirm tables exist, I'll wire:
+   - magic-link auth (`/login` → Supabase Auth)
+   - real `campaigns` insert from `/business/campaigns/new`
+   - bulk `offers` insert + realtime accept/reject
+   - RLS-tested role views
 
-## Learn More
+## Structure
 
-To learn more about Next.js, take a look at the following resources:
+- `src/app/page.tsx` — landing
+- `src/app/business/` — campaign list + auto-match table + new campaign form
+- `src/app/creator/` — offer inbox, accept/reject
+- `supabase/schema.sql` — profiles / campaigns / offers + RLS + realtime
+- `src/lib/` — supabase clients, types, matching, demo-data
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Pitch script (60s)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. `/business`: "SME builds Glow Serum Launch like a Meta ad — budget, niche, brief."
+2. Click "Send offers to top 3": "No DMs. Our layer fires bids to best-fit creators by match score."
+3. Switch to `/creator`: "Maya gets the bid with brief + payout. Accept in one tap."
+4. Back to `/business`: "Brand sees accepted live. Campaign scales from 3 to 300 creators without negotiations."
