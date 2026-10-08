@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { DEMO_CAMPAIGNS, DEMO_CREATORS, DEMO_OFFERS } from "@/lib/demo-data";
+import { DEMO_CAMPAIGNS, DEMO_CREATORS } from "@/lib/demo-data";
+import { loadDemoOffers, saveDemoOffers } from "@/lib/demo-store";
 import { respondToOffer } from "@/app/actions/campaigns";
 import { formatMoney, type Campaign, type Offer, type OfferStatus } from "@/lib/types";
 
@@ -16,12 +17,30 @@ export default function CreatorInbox() {
   const router = useRouter();
   const [me, setMe] = useState(DEMO_CREATORS[0]);
   const [live, setLive] = useState(false);
-  const [offers, setOffers] = useState<OfferWithCampaign[]>(
-    DEMO_OFFERS.filter((o) => o.creator_id === "c1").map((o) => ({
-      ...o,
-      campaign: DEMO_CAMPAIGNS.find((c) => c.id === o.campaign_id),
-    }))
+  const [offers, setOffers] = useState<OfferWithCampaign[]>(() =>
+    loadDemoOffers()
+      .filter((o) => o.creator_id === "c1")
+      .map((o) => ({
+        ...o,
+        campaign: DEMO_CAMPAIGNS.find((c) => c.id === o.campaign_id),
+      }))
   );
+
+  // Refresh demo offers when returning from the business page (e.g. after sending bids)
+  useEffect(() => {
+    if (live) return;
+    const onFocus = () =>
+      setOffers(
+        loadDemoOffers()
+          .filter((o) => o.creator_id === "c1")
+          .map((o) => ({
+            ...o,
+            campaign: DEMO_CAMPAIGNS.find((c) => c.id === o.campaign_id),
+          }))
+      );
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [live]);
 
   useEffect(() => {
     (async () => {
@@ -70,7 +89,13 @@ export default function CreatorInbox() {
 
   async function respond(id: string, status: OfferStatus) {
     if (!live) {
-      setOffers((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
+      const next = offers.map((o) => (o.id === id ? { ...o, status } : o));
+      setOffers(next);
+      // persist to shared demo store (strip joined campaign before saving)
+      const all = loadDemoOffers().map((o) =>
+        o.id === id ? { ...o, status } : o
+      );
+      saveDemoOffers(all);
       return;
     }
     if (status === "pending") return; // undo only in demo

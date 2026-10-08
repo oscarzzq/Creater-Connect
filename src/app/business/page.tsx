@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { DEMO_CAMPAIGNS, DEMO_CREATORS, DEMO_OFFERS } from "@/lib/demo-data";
+import { DEMO_CAMPAIGNS, DEMO_CREATORS } from "@/lib/demo-data";
+import { loadDemoOffers, resetDemoOffers, saveDemoOffers } from "@/lib/demo-store";
 import { rankCreators } from "@/lib/matching";
 import { sendOffers as sendOffersAction } from "@/app/actions/campaigns";
 import { formatFollowers, formatMoney, type Campaign, type Offer, type Profile } from "@/lib/types";
@@ -15,7 +16,7 @@ export default function BusinessDashboard() {
   const [live, setLive] = useState(false);
   const [campaigns, setCampaigns] = useState<Campaign[]>(DEMO_CAMPAIGNS);
   const [creators, setCreators] = useState<Profile[]>(DEMO_CREATORS);
-  const [offers, setOffers] = useState<Offer[]>(DEMO_OFFERS);
+  const [offers, setOffers] = useState<Offer[]>(() => loadDemoOffers());
   const [selectedId, setSelectedId] = useState(DEMO_CAMPAIGNS[0].id);
   const [sending, setSending] = useState(false);
 
@@ -59,7 +60,29 @@ export default function BusinessDashboard() {
   async function sendOffers() {
     if (!selected) return;
     if (!live) {
-      alert(`Demo mode — sign in + run supabase/schema.sql to send real offers.\nWould send to top 3 for "${selected.title}".`);
+      // Demo mode: actually create the offers locally so the creator inbox receives them
+      const existing = new Set(
+        offers.filter((o) => o.campaign_id === selected.id).map((o) => o.creator_id)
+      );
+      const fresh = matches
+        .slice(0, 3)
+        .filter(({ creator }) => !existing.has(creator.id))
+        .map(({ creator, score }, i) => ({
+          id: `demo-${selected.id}-${creator.id}-${Date.now()}-${i}`,
+          campaign_id: selected.id,
+          creator_id: creator.id,
+          payout_cents: Math.min(creator.price_cents, selected.max_payout_cents),
+          status: "pending" as const,
+          match_score: score,
+        }));
+      if (fresh.length === 0) {
+        alert("Top 3 already have offers for this campaign — check the creator inbox ✓");
+        return;
+      }
+      const next = [...offers, ...fresh];
+      setOffers(next);
+      saveDemoOffers(next);
+      alert(`Sent ${fresh.length} demo offers for "${selected.title}" ✓\nOpen Creator view to accept them.`);
       return;
     }
     setSending(true);
@@ -108,7 +131,16 @@ export default function BusinessDashboard() {
 
       {!live && (
         <div className="border-b bg-yellow-50 px-6 py-2 text-center text-xs text-yellow-800">
-          Demo mode — <Link href="/login" className="underline">sign in</Link> + run <code>supabase/schema.sql</code> in your Supabase SQL Editor to go live.
+          Demo mode — offers are stored in this browser.{" "}
+          <button
+            onClick={() => {
+              resetDemoOffers();
+              window.location.reload();
+            }}
+            className="underline"
+          >
+            Reset demo
+          </button>
         </div>
       )}
 
