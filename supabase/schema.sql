@@ -52,6 +52,7 @@ drop policy if exists "campaigns readable by authed" on public.campaigns;
 drop policy if exists "business can manage own campaigns" on public.campaigns;
 drop policy if exists "offers readable by involved parties" on public.offers;
 drop policy if exists "business can manage offers for own campaigns" on public.offers;
+drop policy if exists "business can update own campaign offers" on public.offers;
 drop policy if exists "creator can update own offer status" on public.offers;
 
 -- Profiles: anyone authed can read (needed for matching), users manage own
@@ -87,8 +88,18 @@ create policy "creator can update own offer status"
     auth.uid() = creator_id
   );
 
--- Realtime for offer accept/reject demo wow-factor
-alter publication supabase_realtime add table public.offers;
+-- Realtime for offer accept/reject demo wow-factor (safe to re-run)
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime'
+      and schemaname = 'public'
+      and tablename = 'offers'
+  ) then
+    alter publication supabase_realtime add table public.offers;
+  end if;
+end $$;
 
 -- Seed demo creators (run after you create 2 demo auth users, or use demo mode without auth)
 -- This seed uses fixed UUIDs so you can match them to auth users if needed.
