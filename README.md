@@ -33,11 +33,17 @@ Demo data is in-memory (`src/lib/demo-data.ts`), matching score in `src/lib/matc
 
 ## Structure
 
-- `src/app/page.tsx` — landing
-- `src/app/business/` — campaign list + auto-match table + new campaign form
-- `src/app/creator/` — offer inbox, accept/reject
-- `supabase/schema.sql` — profiles / campaigns / offers + RLS + realtime
-- `src/lib/` — supabase clients, types, matching, demo-data
+Model: **Campaign → Creator set → Creator activation → Post** (creator-posted organic distribution, fixed creator fees, optional delivery guarantee on verified organic views).
+
+- `src/app/business/(app)/` — business app: Overview, Campaigns (Ads Manager: Campaigns | Creator sets | Posts), campaign detail (`campaigns/[id]`: Overview, Creator sets, Roster, Posts, Brief), Inbox, Settings (brand, team, payments & billing, integrations)
+- `src/app/business/campaigns/new/` — 5-step builder (Guided / Advanced): objective & basics → creator sets → brief → creator matching & approval → review & launch
+- `src/app/creator/` — creator app: offer inbox (accept / decline / ask), offer detail with production tracker, work, earnings & profile, onboarding
+- `src/lib/domain/` — typed demo world, pricing + explainable matching (`matching.ts`), derived reporting/inbox (`metrics.ts`)
+- `src/lib/store.ts` — client store shared by business + creator views (localStorage, syncs across tabs; "Reset demo data" in the user menu)
+- `src/components/app/`, `src/components/creator/` — shared UI; `src/components/ui/` — shadcn/ui
+- `supabase/schema.sql` — legacy profiles / campaigns / offers schema (live mode)
+
+Demo data uses a fixed demo date (Oct 8, 2026). **Verified** = platform-confirmed organic views; **Attributed** = clicks/codes/conversions; **Estimate** = projections; **Guaranteed** = contractual floor.
 
 ## Pitch script (60s)
 
