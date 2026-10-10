@@ -12,7 +12,7 @@ import { actions, useAppState } from "@/lib/store";
 import { creatorById } from "@/lib/domain/creators";
 import { compact, relative, shortDate, usd } from "@/lib/domain/format";
 import { ACTIVATION_STATUS } from "@/lib/domain/labels";
-import { PLATFORM_FEE_RATE } from "@/lib/domain/matching";
+import { PLATFORM_FEE_RATE, briefFor } from "@/lib/domain/matching";
 import { payment, sum } from "@/lib/domain/metrics";
 import { cn } from "@/lib/utils";
 import { CreatorPhoto } from "./creator-photo";
@@ -44,15 +44,16 @@ export function ActivationSheet({
   const verifiedViews = sum(mine.filter((p) => p.status === "verified").map((p) => p.metrics?.views ?? 0));
   const replaced = a.replacementFor ? activations.find((x) => x.id === a.replacementFor) : undefined;
   const first = creator.name.split(" ")[0];
-  const fulfillmentNeeded = campaign.brief.fulfillment.kind !== "none";
+  const brief = briefFor(campaign, set);
+  const fulfillmentNeeded = brief.fulfillment.kind !== "none";
 
   const steps: { label: string; at?: string; done: boolean; note?: string }[] = [
     { label: "Recommended by matching", done: true },
     { label: "Approved by you", at: a.approvedAt, done: !!a.approvedAt },
     { label: "Invited", at: a.invitedAt, done: !!a.invitedAt, note: a.status === "invited" && a.expiresAt ? `Expires ${shortDate(a.expiresAt)}` : undefined },
     { label: a.status === "declined" || a.status === "replacement_required" ? "Declined" : "Accepted", at: a.respondedAt, done: !!a.respondedAt && a.status === "accepted" },
-    ...(fulfillmentNeeded ? [{ label: campaign.brief.fulfillment.kind === "ship" ? "Product delivered" : "Access granted", done: a.fulfillment === "delivered", note: a.fulfillment === "shipped" ? "Shipped" : undefined }] : []),
-    { label: campaign.brief.review.required ? "Draft approved" : "Content created", at: mine.map((p) => p.approvedAt).filter(Boolean).sort()[0], done: mine.length > 0 && mine.every((p) => ["approved", "published", "verified"].includes(p.status)) },
+    ...(fulfillmentNeeded ? [{ label: brief.fulfillment.kind === "ship" ? "Product delivered" : "Access granted", done: a.fulfillment === "delivered", note: a.fulfillment === "shipped" ? "Shipped" : undefined }] : []),
+    { label: brief.review.required ? "Draft approved" : "Content created", at: mine.map((p) => p.approvedAt).filter(Boolean).sort()[0], done: mine.length > 0 && mine.every((p) => ["approved", "published", "verified"].includes(p.status)) },
     { label: "Published", at: mine.map((p) => p.publishedAt).filter(Boolean).sort()[0], done: mine.length > 0 && mine.every((p) => p.publishedAt) },
     { label: "Verified", at: mine.map((p) => p.verifiedAt).filter(Boolean).sort().at(-1), done: mine.length > 0 && mine.every((p) => p.status === "verified") },
     { label: a.supplementary ? "Paid by platform (make-good)" : "Creator paid", at: pay.paidAt, done: pay.state === "paid" },
@@ -80,7 +81,7 @@ export function ActivationSheet({
                 </SheetDescription>
                 <div className="mt-1 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
                   <PlatformIcon platform={a.platform} className="size-3.5" />
-                  {campaign.brief.deliverables} × {PLATFORMS[a.platform].format} · Next: {ACTIVATION_STATUS[a.status].owner}
+                  {brief.deliverables} × {PLATFORMS[a.platform].format} · Next: {ACTIVATION_STATUS[a.status].owner}
                 </div>
               </div>
             </div>

@@ -67,7 +67,7 @@ export function Overview() {
     <div className="mx-auto w-full max-w-[1200px] space-y-6 px-4 py-6 sm:px-8 sm:py-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Welcome back, {BUSINESS.user.name.split(" ")[0]}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Welcome back, {BUSINESS.name}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {d.active.length} active campaigns · <Link href="/business/inbox" className="font-medium text-foreground hover:underline">{needsAction.length} things need you</Link>
           </p>

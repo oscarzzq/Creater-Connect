@@ -306,6 +306,13 @@ function CreativeBrief({ item }: { item: CreatorItem }) {
         {b.tone && <p className="mt-1 text-sm text-muted-foreground">{b.tone}</p>}
       </div>
 
+      {item.activation.notes && (
+        <div className="rounded-lg border border-primary/20 bg-brand-subtle/50 p-3 text-sm">
+          <div className="mb-0.5 text-xs font-medium text-brand-subtle-foreground">Just for you from {item.campaign.businessName}</div>
+          {item.activation.notes}
+        </div>
+      )}
+
       {b.talkingPoints.length > 0 && (
         <BriefList title="Talking points" items={b.talkingPoints} icon={<span className="mt-[7px] size-1.5 shrink-0 rounded-full bg-primary" />} />
       )}

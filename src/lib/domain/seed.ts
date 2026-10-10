@@ -1,5 +1,5 @@
 import { creatorById } from "./creators";
-import { guaranteeFloor, matchCreator, quote, recommendRoster } from "./matching";
+import { briefFor, guaranteeFloor, matchCreator, quote } from "./matching";
 import type { Activation, ActivationStatus, Brief, Campaign, CreatorSet, Message, Post, PostMetrics, PostStatus } from "./types";
 
 // Coherent mock world dated relative to the demo clock (2026-10-08).
@@ -54,8 +54,18 @@ const sets: CreatorSet[] = [];
 const activations: Activation[] = [];
 const posts: Post[] = [];
 
-function addSet(s: Omit<CreatorSet, "creatorGeo" | "qualification"> & Partial<Pick<CreatorSet, "creatorGeo" | "qualification">>) {
-  const full: CreatorSet = { creatorGeo: { countries: [], required: false }, qualification: { minMedianViews: 10_000 }, ...s };
+function addSet(
+  s: Omit<CreatorSet, "creatorGeo" | "qualification" | "selection" | "includeCreators" | "excludeCreators"> &
+    Partial<Pick<CreatorSet, "creatorGeo" | "qualification" | "selection" | "includeCreators" | "excludeCreators">>
+) {
+  const full: CreatorSet = {
+    creatorGeo: { countries: [], required: false },
+    qualification: { minMedianViews: 10_000 },
+    selection: "automatic",
+    includeCreators: [],
+    excludeCreators: [],
+    ...s,
+  };
   sets.push(full);
   return full;
 }
@@ -77,7 +87,7 @@ type ActSeed = {
 function addActivation(a: ActSeed) {
   const campaign = campaigns.find((c) => c.id === a.set.campaignId)!;
   const creator = creatorById(a.creatorId)!;
-  const q = quote(creator, a.set.platforms, campaign.brief.deliverables)!;
+  const q = quote(creator, a.set.platforms, briefFor(campaign, a.set).deliverables)!;
   const m = matchCreator(creator, a.set, campaign);
   const invited = a.invited;
   const act: Activation = {
@@ -221,6 +231,7 @@ const s1a = addSet({
   demographics: { ageMin: 18, ageMax: 34, gender: "women", languages: ["English"] },
   niches: ["beauty"], interests: ["skincare routines", "serums", "sensitive skin", "morning routines"],
   qualification: { minMedianViews: 20_000 },
+  selection: "manual",
 });
 const s1b = addSet({
   id: "set1b", campaignId: "camp1", name: "B · Student skincare on Reels",
@@ -298,8 +309,9 @@ addActivation({ id: "act20", set: s2, creatorId: "c2", status: "invited", invite
 const a21 = addActivation({ id: "act21", set: s2, creatorId: "c19", status: "accepted", invited: "2026-10-01T09:30:00", responded: "2026-10-04T08:45:00", fulfillment: "shipped" });
 addPosts(a21, [{ status: "not_started", thumb: "c-protein-bars", due: "2026-10-20T23:59:00" }]);
 addActivation({ id: "act22", set: s2, creatorId: "c20", status: "invited", invited: "2026-10-07T11:20:00" });
-addActivation({ id: "act23", set: s2, creatorId: "c5", status: "replacement_required", invited: "2026-10-01T09:30:00", responded: "2026-10-03T12:00:00", declineReason: "Not taking snack sponsorships this month." });
-addActivation({ id: "act24", set: s2, creatorId: "c26", status: "recommended", replacementFor: "act23" });
+addActivation({ id: "act23", set: s2, creatorId: "c5", status: "declined", invited: "2026-10-01T09:30:00", responded: "2026-10-03T12:00:00", declineReason: "Not taking snack sponsorships this month." });
+// Automatic selection: the replacement was invited without waiting for approval.
+addActivation({ id: "act24", set: s2, creatorId: "c26", status: "invited", invited: "2026-10-03T12:05:00", replacementFor: "act23" });
 campaigns[1].guarantee!.minViews = guaranteeFloor(lowSum("camp2"));
 
 // ---------------------------------------------------------------------------
@@ -478,7 +490,7 @@ campaigns.push({
   guarantee: { minViews: 0, platforms: ["tiktok"], windowDays: 30, verification: "Platform API, organic views only", remedy: "supplementary_creators" },
   createdAt: "2026-10-07T16:00:00",
 });
-const s6a = addSet({
+addSet({
   id: "set6a", campaignId: "camp6", name: "A · Night routines (women 25–44)",
   hypothesis: "Night-routine creators reach the core buyer.",
   platforms: ["tiktok"], audienceGeo: ["US", "CA"],
@@ -486,7 +498,7 @@ const s6a = addSet({
   niches: ["beauty"], interests: ["skincare routines", "sensitive skin", "K-beauty"],
   qualification: { minMedianViews: 20_000 },
 });
-const s6b = addSet({
+addSet({
   id: "set6b", campaignId: "camp6", name: "B · Men's skincare",
   hypothesis: "Men's skincare creators open a new audience at lower cost.",
   platforms: ["tiktok"], audienceGeo: ["US"],
@@ -494,13 +506,7 @@ const s6b = addSet({
   niches: ["beauty", "fitness"], interests: ["men's skincare", "gym routines"],
   qualification: { minMedianViews: 20_000 },
 });
-let n = 60;
-for (const [set, budget] of [[s6a, 2600], [s6b, 1400]] as const) {
-  for (const m of recommendRoster(set, campaigns[5], budget)) {
-    addActivation({ id: `act${n++}`, set, creatorId: m.creator.id, status: "recommended" });
-  }
-}
-campaigns[5].guarantee!.minViews = guaranteeFloor(activations.filter((a) => a.campaignId === "camp6").map((a) => a.estViews[0]));
+// Drafts have no roster yet: matching runs when the campaign is published.
 
 // ---------------------------------------------------------------------------
 // Other brands (creator inbox)

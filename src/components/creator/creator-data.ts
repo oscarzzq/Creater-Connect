@@ -109,7 +109,9 @@ export function useCreatorItems(creatorId: string) {
         const phase = phaseOf(activation, campaign, mine);
         const tab: InboxTab = status === "invited" ? "new" : status === "accepted" ? (pay.state === "paid" ? "completed" : "active") : "declined";
         const todo = status === "accepted" ? (needsReceipt(activation, campaign) ? 1 : mine.filter(postNeedsCreator).length) : 0;
-        return [{ activation, campaign, set: sets.find((s) => s.id === activation.setId), posts: mine, status, tab, paidAt: pay.paidAt, phase, todo }];
+        const set = sets.find((s) => s.id === activation.setId);
+        // Creators receive their set's own creative when it has one.
+        return [{ activation, campaign: set?.brief ? { ...campaign, brief: set.brief } : campaign, set, posts: mine, status, tab, paidAt: pay.paidAt, phase, todo }];
       })
       .sort((a, b) => lastActivity(b.activation).localeCompare(lastActivity(a.activation)));
 

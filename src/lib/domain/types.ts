@@ -83,6 +83,13 @@ export interface CreatorSet {
   qualification: { minMedianViews: number; followerRange?: [number, number] };
   budget?: number; // manual allocation cap; automatic sets derive from roster
   creatorCount?: [number, number];
+  /** Automatic: we pick and invite creators within your rules. Manual: you approve each one. */
+  selection: "automatic" | "manual";
+  maxFee?: number; // cap on any single creator's fixed fee
+  includeCreators: string[]; // creators you asked for (invited first if they qualify)
+  excludeCreators: string[];
+  /** The set's ad: its creative brief. Undefined = use the campaign's default brief. */
+  brief?: Brief;
 }
 
 export interface PlatformStats {
@@ -149,6 +156,7 @@ export interface Activation {
   supplementary?: boolean; // added at platform expense (make-good)
   fulfillment: "not_needed" | "pending" | "shipped" | "delivered";
   messages: Message[];
+  notes?: string; // extra instructions for this creator only
 }
 
 export type PostStatus = "not_started" | "draft_submitted" | "revision_requested" | "approved" | "published" | "verified";

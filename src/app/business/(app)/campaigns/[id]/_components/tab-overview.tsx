@@ -53,10 +53,10 @@ export function OverviewTab({ campaign, sets, activations, posts, rollup: r, goT
   if (campaign.status === "draft") {
     return (
       <div className="surface p-6 text-sm">
-        <p>This campaign hasn&apos;t launched. Review each creator set&apos;s recommended roster, approve the creators you want, then launch to send fixed-fee offers.</p>
-        <button className="mt-3 inline-flex items-center gap-1 font-medium text-primary" onClick={() => goTo("sets")}>
-          Review creator sets <ArrowRight className="size-4" />
-        </button>
+        <p>This campaign is a draft. Publishing runs matching: automatic creator sets invite creators straight away, manual sets get recommendations for you to approve.</p>
+        <Link href={`/business/campaigns/${campaign.id}/edit`} className="mt-3 inline-flex items-center gap-1 font-medium text-primary">
+          Review & publish <ArrowRight className="size-4" />
+        </Link>
       </div>
     );
   }

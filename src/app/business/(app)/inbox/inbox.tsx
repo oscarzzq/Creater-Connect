@@ -206,9 +206,9 @@ function Detail({ item }: { item: InboxItem }) {
         {/* Recommendations ready */}
         {item.kind === "review_recommendations" && (
           <div className="surface p-4 text-sm">
-            <p>Matching found creators for each creator set. Approve the ones you want; fixed-fee offers go out when you launch.</p>
+            <p>This creator set uses manual review. Approve the creators you want; their fixed-fee offers go out as soon as you approve.</p>
             <Button asChild className="mt-3">
-              <Link href={`/business/campaigns/${campaign.id}?tab=sets`}>
+              <Link href={`/business/campaigns/${campaign.id}?tab=sets${item.setId ? `&set=${item.setId}` : ""}`}>
                 Review creators <ArrowRight />
               </Link>
             </Button>

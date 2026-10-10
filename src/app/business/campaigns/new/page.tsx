@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
-import { CampaignBuilder } from "./_components/campaign-builder";
+import { OverlayProvider } from "@/components/app/overlays";
+import { CampaignEditor } from "../../_editor/editor";
 
-export const metadata: Metadata = {
-  title: "New campaign · Creator Connect",
-};
+export const metadata: Metadata = { title: "New campaign · Creator Connect" };
 
 export default function NewCampaignPage() {
-  return <CampaignBuilder />;
+  return (
+    <OverlayProvider>
+      <CampaignEditor mode="create" />
+    </OverlayProvider>
+  );
 }

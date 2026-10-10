@@ -3,11 +3,10 @@
 import { use, useMemo } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChevronRight, Eye, Flag, MessageSquare, Rocket, ShieldCheck, UserRoundPlus, Users } from "lucide-react";
-import { toast } from "sonner";
+import { ChevronRight, Eye, Flag, MessageSquare, Pencil, Rocket, ShieldCheck, UserRoundPlus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PlatformIconRow } from "@/components/platform-icon";
-import { actions, useAppState } from "@/lib/store";
+import { useAppState } from "@/lib/store";
 import { TODAY, compact, daysBetween, shortDate, usd } from "@/lib/domain/format";
 import { OBJECTIVES, REMEDIES } from "@/lib/domain/labels";
 import { campaignRollup, campaignStage } from "@/lib/domain/metrics";
@@ -28,7 +27,7 @@ export function CampaignDetail({ params }: { params: Promise<{ id: string }> }) 
   const pathname = usePathname();
   const search = useSearchParams();
   const campaign = world.campaigns.find((c) => c.id === id);
-  const tab = search.get("tab") ?? (campaign?.status === "draft" ? "sets" : "overview");
+  const tab = search.get("tab") ?? "overview";
 
   const data = useMemo(() => {
     if (!campaign) return null;
@@ -55,17 +54,17 @@ export function CampaignDetail({ params }: { params: Promise<{ id: string }> }) 
   const replacements = activations.filter((a) => a.status === "recommended" && a.replacementFor);
   const toReview = posts.filter((p) => p.status === "draft_submitted");
   const questions = activations.filter((a) => a.messages.at(-1)?.from === "creator");
-  const approvedCount = activations.filter((a) => a.status === "approved").length;
+  const recommended = activations.filter((a) => a.status === "recommended" && !a.replacementFor);
   const daysLeft = daysBetween(TODAY, campaign.endDate);
   const elapsed = Math.max(0, Math.min(1, daysBetween(campaign.startDate, TODAY) / Math.max(1, daysBetween(campaign.startDate, campaign.endDate))));
 
   // One primary action: the next thing that unblocks the campaign.
   const primary =
     campaign.status === "draft"
-      ? approvedCount
-        ? { label: `Launch with ${approvedCount} creators`, icon: Rocket, run: () => { actions.launch(campaign.id); toast.success(`${campaign.name} launched`, { description: `${approvedCount} creators invited. They have 7 days to accept.` }); goTo("overview"); } }
-        : { label: "Review recommended creators", icon: Users, run: () => goTo("sets") }
-      : replacements.length
+      ? { label: "Review & publish", icon: Rocket, run: () => router.push(`/business/campaigns/${campaign.id}/edit`) }
+      : recommended.length
+        ? { label: `Approve ${recommended.length} creators`, icon: Users, run: () => goTo("sets", { set: recommended[0].setId }) }
+        : replacements.length
         ? { label: `Approve ${replacements.length} replacement${replacements.length > 1 ? "s" : ""}`, icon: UserRoundPlus, run: () => goTo("roster", { status: "attention" }) }
         : toReview.length
           ? { label: `Review ${toReview.length} draft${toReview.length > 1 ? "s" : ""}`, icon: Eye, run: () => goTo("posts", { status: "draft_submitted" }) }
@@ -103,6 +102,11 @@ export function CampaignDetail({ params }: { params: Promise<{ id: string }> }) 
                 {campaign.promoting.kind === "brand" ? "Brand awareness" : campaign.promoting.name} · {OBJECTIVES[campaign.objective].label} · <PlatformIconRow platforms={[...new Set(sets.flatMap((s) => s.platforms))]} className="align-[-2px]" />
               </p>
             </div>
+            <Button variant="outline" className="h-9" asChild>
+              <Link href={`/business/campaigns/${campaign.id}/edit`}>
+                <Pencil /> Edit
+              </Link>
+            </Button>
             {primary && (
               <Button className="h-9" onClick={primary.run}>
                 <primary.icon />

@@ -10,7 +10,6 @@ import { CTAS } from "@/lib/domain/labels";
 import type { Brief, CtaType } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
 import { FieldLabel, FormSection, Helper } from "./form-section";
-import type { StepProps } from "./builder-state";
 
 const MEASUREMENT: Record<CtaType, string> = {
   website: "UTM link clicks",
@@ -23,17 +22,12 @@ const MEASUREMENT: Record<CtaType, string> = {
   visit_store: "In-store code redemptions",
 };
 
-export function StepBrief({ draft, mode, setCampaign }: StepProps) {
-  const b = draft.campaign.brief;
-  const set = (patch: Partial<Brief>) => setCampaign((c) => ({ ...c, brief: { ...c.brief, ...patch } }));
-  const [moreOpen, setMoreOpen] = useState(mode === "advanced");
+export function AdForm({ brief: b, onChange }: { brief: Brief; onChange: (patch: Partial<Brief>) => void }) {
+  const set = onChange;
+  const [moreOpen, setMoreOpen] = useState(false);
 
   return (
     <div className="space-y-5">
-      <div className="rounded-xl border border-dashed bg-card/60 p-4 text-sm text-muted-foreground">
-        This is the default brief for every creator in the campaign. Creators keep their own voice; you set the must-haves.
-      </div>
-
       <FormSection title="Product information">
         <div className="space-y-4">
           <div>

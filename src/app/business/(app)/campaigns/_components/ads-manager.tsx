@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
-import { ArrowDown, ArrowUp, ChartLine, Columns3, Filter, Plus, Search, X } from "lucide-react";
+import { ArrowDown, ArrowUp, ChartLine, Columns3, Filter, Pencil, Plus, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { PLATFORMS, PLATFORM_ORDER, PlatformIcon, PlatformIconRow } from "@/components/platform-icon";
@@ -273,6 +273,12 @@ export function AdsManager() {
 
   const chartFormat = chartMetric === "spend" ? (n: number) => `$${compact(n)}` : chartMetric === "cpm" ? (n: number) => `$${n.toFixed(0)}` : compact;
 
+  // Meta-style: select exactly one row, then Edit opens the editor on that node.
+  const editHref =
+    level === "campaigns" && selCampaigns.length === 1 ? `/business/campaigns/${selCampaigns[0]}/edit`
+    : level === "sets" && selSets.length === 1 ? `/business/campaigns/${data.sets.find((x) => x.s.id === selSets[0])?.c.id}/edit?node=set:${selSets[0]}`
+    : level === "posts" && selPosts.length === 1 ? (() => { const p = data.posts.find((x) => x.p.id === selPosts[0]); return p ? `/business/campaigns/${p.c.id}/edit?node=creator:${p.a.id}` : null; })()
+    : null;
   const cols = level === "campaigns" ? campaignCols : level === "sets" ? setCols : postCols;
   const activeFilters = stages.length + objectives.length + platforms.length + creatorFilter.length;
 
@@ -297,7 +303,7 @@ export function AdsManager() {
           [
             ["campaigns", "Campaigns", data.campaigns.length, selCampaigns.length, () => setSelCampaigns([])],
             ["sets", "Creator sets", data.sets.length, selSets.length, () => setSelSets([])],
-            ["posts", "Posts", data.posts.length, selPosts.length, () => setSelPosts([])],
+            ["posts", "Ads", data.posts.length, selPosts.length, () => setSelPosts([])],
           ] as const
         ).map(([key, label, count, sel, clear]) => (
           <button key={key} onClick={() => { setLevel(key); setSort(null); }} className={cn("relative flex items-center gap-2 border-r px-4 py-3 text-left text-sm font-medium last:border-r-0 hover:bg-muted/40", level === key && "bg-brand-subtle/40")}>
@@ -318,7 +324,7 @@ export function AdsManager() {
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative w-full sm:w-56">
           <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={`Search ${level === "sets" ? "creator sets" : level}`} className="h-8 w-full rounded-lg border bg-card pr-3 pl-8 text-sm shadow-card outline-none focus:border-ring focus:ring-3 focus:ring-ring/30" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={`Search ${level === "sets" ? "creator sets" : level === "posts" ? "ads" : "campaigns"}`} className="h-8 w-full rounded-lg border bg-card pr-3 pl-8 text-sm shadow-card outline-none focus:border-ring focus:ring-3 focus:ring-ring/30" />
         </div>
         <FilterMenu label="Status" icon options={(Object.keys(STAGES) as CampaignStage[]).map((s) => [s, STAGES[s].label])} value={stages} onChange={setStages} />
         <FilterMenu label="Objective" options={(Object.keys(OBJECTIVES) as Objective[]).map((o) => [o, OBJECTIVES[o].label])} value={objectives} onChange={setObjectives} />
@@ -330,6 +336,9 @@ export function AdsManager() {
           </Button>
         )}
         <div className="ml-auto flex items-center gap-2">
+          <Button variant="outline" size="sm" className="h-8 bg-card shadow-card" disabled={!editHref} asChild={!!editHref} title={editHref ? undefined : "Select one row to edit"}>
+            {editHref ? <Link href={editHref}><Pencil />Edit</Link> : <span><Pencil />Edit</span>}
+          </Button>
           <Segmented value={range} onChange={setRange} options={[["30", "30D"], ["90", "90D"], ["180", "180D"], ["all", "All"]]} />
           <Popover>
             <PopoverTrigger asChild>
@@ -404,9 +413,12 @@ export function AdsManager() {
                   <Photo src={x.c.promoting.image} alt="" sizes="64px" />
                 </span>
                 <span className="min-w-0">
-                  <Link href={`/business/campaigns/${x.c.id}`} className="block truncate font-medium hover:underline">
-                    {x.c.name}
-                  </Link>
+                  <span className="flex items-center gap-2">
+                    <Link href={`/business/campaigns/${x.c.id}`} className="block truncate font-medium hover:underline">
+                      {x.c.name}
+                    </Link>
+                    <Link href={`/business/campaigns/${x.c.id}/edit`} className="hidden text-xs font-medium text-primary group-hover/row:inline hover:underline">Edit</Link>
+                  </span>
                   <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <PlatformIconRow platforms={[...new Set(world.sets.filter((s) => s.campaignId === x.c.id).flatMap((s) => s.platforms))]} />
                     <button className="hover:text-foreground hover:underline" onClick={() => { setSelCampaigns([x.c.id]); setLevel("sets"); }}>
@@ -458,7 +470,7 @@ export function AdsManager() {
             hiddenIds={hidden[level]}
             sort={sort}
             setSort={setSort}
-            noun="posts"
+            noun="ads"
               rows={data.posts}
               cols={postCols}
               rowKey={(x) => x.p.id}
@@ -486,7 +498,7 @@ export function AdsManager() {
             <p className="text-xs text-muted-foreground">* Published, still verifying. Excluded from totals until verified (up to 48h).</p>
           </>
         ) : (
-          <EmptyState icon={Filter} title="No posts yet" description="Posts appear as soon as creators accept. Select a different creator set or clear filters." />
+          <EmptyState icon={Filter} title="No ads yet" description="Posts appear as soon as creators accept. Select a different creator set or clear filters." />
         ))}
     </div>
   );
@@ -530,7 +542,7 @@ hiddenIds: string[]; sort: { id: string; dir: 1 | -1 } | null; setSort: React.Di
             const k = rowKey(r);
             const on = selected.includes(k);
             return (
-              <tr key={k} className={cn("transition-colors hover:bg-muted/30", on && "bg-brand-subtle/40")}>
+              <tr key={k} className={cn("group/row transition-colors hover:bg-muted/30", on && "bg-brand-subtle/40")}>
                 <td className="px-3 py-2.5">
                   <input type="checkbox" aria-label="Select row" className="size-4 accent-(--primary)" checked={on} onChange={() => setSelected(on ? selected.filter((x) => x !== k) : [...selected, k])} />
                 </td>

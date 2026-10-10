@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { Copy, FlaskConical, UserRoundPlus } from "lucide-react";
+import { Bot, Copy, FlaskConical, Hand, Pencil, UserRoundPlus } from "lucide-react";
+import Link from "next/link";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { PLATFORMS, PlatformIcon } from "@/components/platform-icon";
@@ -59,12 +60,24 @@ export function SetsTab({ campaign, sets, activations, posts, focusSet }: Detail
                 {s.hypothesis && <p className="mt-0.5 text-sm text-muted-foreground">Hypothesis: {s.hypothesis}</p>}
               </div>
               <div className="flex gap-2">
+                <span className="inline-flex h-7 items-center gap-1.5 rounded-md bg-muted px-2 text-xs font-medium text-muted-foreground">
+                  {s.selection === "automatic" ? <Bot className="size-3.5" /> : <Hand className="size-3.5" />}
+                  {s.selection === "automatic" ? "Automatic selection" : "Manual review"}
+                </span>
+                <Button size="sm" variant="outline" asChild>
+                  <Link href={`/business/campaigns/${campaign.id}/edit?node=set:${s.id}`}>
+                    <Pencil /> Edit
+                  </Link>
+                </Button>
                 <Button size="sm" variant="outline" onClick={() => { actions.duplicateSet(s.id); toast.success("Creator set duplicated", { description: "Adjust its targeting to test a variant." }); }}>
                   <Copy />
                   Duplicate
                 </Button>
-                {campaign.status !== "completed" && (
-                  <Button size="sm" variant="outline" onClick={() => { actions.requestAlternatives(s.id); toast("Added more recommended creators"); }}>
+                {campaign.status === "active" && (
+                  <Button size="sm" variant="outline" onClick={() => {
+                    if (s.selection === "automatic") { actions.fillRoster(s.id); toast("Inviting more creators within this set's budget"); }
+                    else { actions.requestAlternatives(s.id); toast("Added more recommended creators"); }
+                  }}>
                     <UserRoundPlus />
                     More creators
                   </Button>

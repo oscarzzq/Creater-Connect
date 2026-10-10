@@ -38,6 +38,11 @@ export function quote(creator: Creator, platforms: Platform[], deliverables: num
   return { platform: stats.platform, stats, fee, estViews: [low, expected, high], ecpm: (withPlatformFee(fee) / expected) * 1000 };
 }
 
+/** The brief creators in a set actually receive: the set's own ad, or the campaign default. */
+export function briefFor(campaign: Pick<Campaign, "brief">, set?: Pick<CreatorSet, "brief">) {
+  return set?.brief ?? campaign.brief;
+}
+
 // ---------------------------------------------------------------------------
 // Matching
 
@@ -84,12 +89,14 @@ export function audienceShares(creator: Creator, set: CreatorSet) {
 }
 
 export function matchCreator(creator: Creator, set: CreatorSet, campaign: Pick<Campaign, "brief">): MatchResult {
-  const q = quote(creator, set.platforms, campaign.brief.deliverables);
+  const q = quote(creator, set.platforms, briefFor(campaign, set).deliverables);
   const exclusions: string[] = [];
   const { ageShare, geoShare } = audienceShares(creator, set);
   const nicheHit = creator.niches.filter((n) => set.niches.includes(n));
 
   // ---- Strict qualifications: failing any removes the creator.
+  if (set.excludeCreators?.includes(creator.id)) exclusions.push("Excluded by you");
+  if (q && set.maxFee && q.fee > set.maxFee) exclusions.push(`Fixed fee ${usd(q.fee)} is above your ${usd(set.maxFee)} max per creator`);
   if (!q) exclusions.push(`Not on ${set.platforms.map(platformName).join(" or ")}`);
   if (set.niches.length && !nicheHit.length) exclusions.push(`Creates ${NICHE_LABEL[creator.niches[0]]} content`);
   if (set.creatorGeo.required && set.creatorGeo.countries.length && !set.creatorGeo.countries.includes(creator.country))
@@ -188,10 +195,12 @@ export function matchSet(set: CreatorSet, campaign: Pick<Campaign, "brief">, cre
 /** Greedy roster: best matches first until the budget for this set runs out. */
 export function recommendRoster(set: CreatorSet, campaign: Pick<Campaign, "brief">, budget: number, exclude: string[] = []) {
   const { matches } = matchSet(set, campaign);
+  const requested = matches.filter((m) => set.includeCreators?.includes(m.creator.id));
+  const ordered = [...requested, ...matches.filter((m) => !requested.includes(m))];
   const roster: MatchResult[] = [];
   let left = budget;
   const max = set.creatorCount?.[1] ?? 12;
-  for (const m of matches) {
+  for (const m of ordered) {
     if (exclude.includes(m.creator.id) || !m.quote) continue;
     const cost = withPlatformFee(m.quote.fee);
     if (cost > left || roster.length >= max) continue;
@@ -221,6 +230,8 @@ export function exclusionSummary(excluded: MatchResult[]) {
       : reason.includes("followers") ? "Outside follower range"
       : reason.startsWith("Doesn't post") ? "Language"
       : reason.startsWith("Audience is only") ? "Audience gender mismatch"
+      : reason.startsWith("Excluded") ? "Excluded by you"
+      : reason.startsWith("Fixed fee") ? "Above max fee"
       : "Audience quality";
     buckets[key] = (buckets[key] ?? 0) + 1;
   }

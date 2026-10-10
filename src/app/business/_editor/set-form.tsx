@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ChevronDown, Copy, FlaskConical, Plus, Search, Trash2 } from "lucide-react";
+import { Check, ChevronDown, Plus, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -13,80 +13,29 @@ import { PLATFORMS, PLATFORM_ORDER, PlatformIcon } from "@/components/platform-i
 import { COUNTRY_FLAGS, COUNTRY_NAMES, compact, usd } from "@/lib/domain/format";
 import { NICHES, NICHE_LABEL } from "@/lib/domain/labels";
 import { matchSet } from "@/lib/domain/matching";
-import type { CreatorSet, NicheId, Platform } from "@/lib/domain/types";
+import type { Campaign, CreatorSet, NicheId, Platform } from "@/lib/domain/types";
+import { CREATORS } from "@/lib/domain/creators";
+import { matchCreator } from "@/lib/domain/matching";
+import { SelectableCard } from "@/components/selectable-card";
+import { CreatorPhoto } from "@/components/app/creator-photo";
+import { Bot, Hand, UserMinus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FieldLabel, FormSection, Helper, MoneyInput } from "./form-section";
-import { INTEREST_SUGGESTIONS, newSet, setBudget, type StepProps } from "./builder-state";
+import { INTEREST_SUGGESTIONS } from "./editor-state";
 
 const COUNTRIES = ["US", "CA", "GB", "AU", "IE", "DE", "FR", "MX", "BR", "IN", "KR", "NG"];
 const LANGUAGES = ["English", "Spanish", "Korean", "French", "Portuguese"];
 const AGES = [13, 18, 25, 35, 45, 55, 65];
 
-export function StepSets(props: StepProps) {
-  const { draft, mode, setSets } = props;
-  const [activeId, setActiveId] = useState<string | undefined>(draft.sets[0]?.id);
-  const active = draft.sets.find((s) => s.id === activeId) ?? draft.sets[0];
-  const patch = (id: string, p: Partial<CreatorSet>) => setSets((sets) => sets.map((s) => (s.id === id ? { ...s, ...p } : s)));
-
-  if (mode === "guided") {
-    const set = draft.sets[0];
-    return (
-      <div className="space-y-5">
-        <div className="rounded-xl border border-dashed bg-card/60 p-4 text-sm text-muted-foreground">
-          Tell us who you want to reach. We&apos;ll build one recommended creator set from these answers. Switch to <span className="font-medium text-foreground">Advanced</span> to create and compare multiple creator sets.
-        </div>
-        <SetEditor set={set} onChange={(p) => patch(set.id, p)} draft={draft} simple />
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap items-center gap-2">
-        {draft.sets.map((s, i) => (
-          <button
-            key={s.id}
-            onClick={() => setActiveId(s.id)}
-            className={cn("inline-flex h-9 items-center gap-2 rounded-lg border bg-card px-3 text-sm font-medium shadow-card", active?.id === s.id ? "border-primary ring-1 ring-primary" : "text-muted-foreground hover:text-foreground")}
-          >
-            <span className="flex size-5 items-center justify-center rounded bg-muted text-[11px] tabular-nums">{String.fromCharCode(65 + i)}</span>
-            <span className="max-w-48 truncate">{s.name}</span>
-          </button>
-        ))}
-        <Button variant="outline" size="sm" className="h-9" onClick={() => { const s = newSet(draft.campaign.id, draft.sets.length); setSets((x) => [...x, s]); setActiveId(s.id); }}>
-          <Plus /> Add creator set
-        </Button>
-      </div>
-      {active && (
-        <>
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <FlaskConical className="size-3.5" /> Create sets for different audiences, niches, platforms or creative strategies, then compare results. Comparisons are observational, not controlled A/B tests.
-            </p>
-            <div className="flex gap-2">
-              <Button size="sm" variant="outline" onClick={() => { const copy = { ...active, id: `set-${Date.now().toString(36)}`, name: `${active.name} (copy)` }; setSets((x) => [...x, copy]); setActiveId(copy.id); }}>
-                <Copy /> Duplicate
-              </Button>
-              <Button size="sm" variant="ghost" disabled={draft.sets.length === 1} onClick={() => { setSets((x) => x.filter((s) => s.id !== active.id)); setActiveId(draft.sets.find((s) => s.id !== active.id)?.id); }}>
-                <Trash2 /> Remove
-              </Button>
-            </div>
-          </div>
-          <SetEditor key={active.id} set={active} onChange={(p) => patch(active.id, p)} draft={draft} />
-        </>
-      )}
-    </div>
-  );
-}
-
-function SetEditor({ set, onChange, draft, simple = false }: { set: CreatorSet; onChange: (p: Partial<CreatorSet>) => void; draft: StepProps["draft"]; simple?: boolean }) {
-  const { matches } = matchSet(set, draft.campaign);
+export function SetForm({ set, onChange, campaign, budget }: { set: CreatorSet; onChange: (p: Partial<CreatorSet>) => void; campaign: Campaign; budget: number }) {
+  const { matches } = matchSet(set, campaign);
   const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
-  const [moreOpen, setMoreOpen] = useState(!simple);
+  const simple = false;
+  const [moreOpen, setMoreOpen] = useState(true);
 
   return (
     <div className="space-y-5">
-      {!simple && (
+      {(
         <FormSection title="Creator set">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -100,6 +49,8 @@ function SetEditor({ set, onChange, draft, simple = false }: { set: CreatorSet; 
           </div>
         </FormSection>
       )}
+
+      <SelectionSection set={set} onChange={onChange} campaign={campaign} />
 
       <FormSection title="Platforms" description="Creators post organically on these platforms." action={<span className="text-xs text-muted-foreground tabular-nums">{matches.length} creators qualify</span>}>
         <div className="grid gap-2 sm:grid-cols-3">
@@ -232,11 +183,11 @@ function SetEditor({ set, onChange, draft, simple = false }: { set: CreatorSet; 
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <FieldLabel>Budget for this set</FieldLabel>
-                  {draft.campaign.allocation === "manual" ? (
-                    <MoneyInput value={set.budget ?? setBudget(draft, set)} onChange={(v) => onChange({ budget: v })} />
+                  {campaign.allocation === "manual" ? (
+                    <MoneyInput value={set.budget ?? budget} onChange={(v) => onChange({ budget: v })} />
                   ) : (
                     <p className="text-sm">
-                      <span className="font-semibold tabular-nums">{usd(setBudget(draft, set))}</span> <span className="text-muted-foreground">predicted (automatic)</span>
+                      <span className="font-semibold tabular-nums">{usd(budget)}</span> <span className="text-muted-foreground">predicted (automatic)</span>
                     </p>
                   )}
                 </div>
@@ -351,5 +302,95 @@ function InterestInput({ value, onChange, suggestions }: { value: string[]; onCh
         ))}
       </div>
     </div>
+  );
+}
+
+function SelectionSection({ set, onChange, campaign }: { set: CreatorSet; onChange: (p: Partial<CreatorSet>) => void; campaign: Campaign }) {
+  const [q, setQ] = useState("");
+  const results = q.trim()
+    ? CREATORS.filter((c) => `${c.name} ${c.handle}`.toLowerCase().includes(q.toLowerCase()) && !set.includeCreators.includes(c.id)).slice(0, 6)
+    : [];
+  return (
+    <FormSection title="Creator selection" description="How creators get onto this set's roster.">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <SelectableCard selected={set.selection === "automatic"} onSelect={() => onChange({ selection: "automatic" })}>
+          <span className="flex items-center gap-2 font-medium">
+            <Bot className="size-4 text-primary" /> Automatic <span className="rounded bg-brand-subtle px-1.5 py-0.5 text-[10px] font-semibold text-brand-subtle-foreground">Recommended</span>
+          </span>
+          <span className="pr-5 text-sm text-muted-foreground">We pick and invite the best-fit creators within your rules and budget, and replace anyone who declines. You can exclude creators anytime before they accept.</span>
+        </SelectableCard>
+        <SelectableCard selected={set.selection === "manual"} onSelect={() => onChange({ selection: "manual" })}>
+          <span className="flex items-center gap-2 font-medium">
+            <Hand className="size-4 text-muted-foreground" /> Manual review
+          </span>
+          <span className="pr-5 text-sm text-muted-foreground">We recommend creators after you publish; you approve each one before their fixed-fee offer is sent.</span>
+        </SelectableCard>
+      </div>
+
+      <div className="mt-5 grid gap-5 sm:grid-cols-2">
+        <div>
+          <label className="flex items-center gap-2 text-sm font-medium">
+            <Switch checked={!!set.maxFee} onCheckedChange={(v) => onChange({ maxFee: v ? 400 : undefined })} />
+            Cap the fee per creator
+          </label>
+          {set.maxFee ? (
+            <div className="mt-2 max-w-48">
+              <MoneyInput value={set.maxFee} onChange={(v) => onChange({ maxFee: v || undefined })} />
+            </div>
+          ) : null}
+          <Helper>Creators whose fixed fee is above the cap are never invited.</Helper>
+        </div>
+        <div>
+          <FieldLabel hint="Invited first if they qualify">Include specific creators</FieldLabel>
+          <div className="relative">
+            <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name or @handle" className="h-9 w-full rounded-lg border border-input bg-transparent pr-3 pl-8 text-sm outline-none focus:border-ring focus:ring-3 focus:ring-ring/50" />
+            {results.length > 0 && (
+              <div className="absolute inset-x-0 top-10 z-20 rounded-lg border bg-popover p-1 shadow-float">
+                {results.map((c) => {
+                  const m = matchCreator(c, set, campaign);
+                  return (
+                    <button key={c.id} type="button" onClick={() => { onChange({ includeCreators: [...set.includeCreators, c.id], excludeCreators: set.excludeCreators.filter((x) => x !== c.id) }); setQ(""); }} className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-accent">
+                      <CreatorPhoto creator={c} size={22} />
+                      <span className="flex-1 truncate">{c.name} <span className="text-xs text-muted-foreground">{c.handle}</span></span>
+                      <span className={cn("text-[11px]", m.eligible ? "text-success-text" : "text-warning-text")}>{m.eligible ? `Fit ${m.score}` : "Doesn't qualify"}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {set.includeCreators.map((id) => {
+              const c = CREATORS.find((x) => x.id === id)!;
+              const m = matchCreator(c, set, campaign);
+              return (
+                <Tag key={id} onRemove={() => onChange({ includeCreators: set.includeCreators.filter((x) => x !== id) })}>
+                  <CreatorPhoto creator={c} size={16} />
+                  {c.name}
+                  {!m.eligible && <span className="text-[10px] text-warning-text" title={m.exclusions.join("; ")}>· won&apos;t qualify</span>}
+                </Tag>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+      {set.excludeCreators.length > 0 && (
+        <div className="mt-4">
+          <FieldLabel>Excluded creators</FieldLabel>
+          <div className="flex flex-wrap gap-1.5">
+            {set.excludeCreators.map((id) => {
+              const c = CREATORS.find((x) => x.id === id)!;
+              return (
+                <Tag key={id} onRemove={() => onChange({ excludeCreators: set.excludeCreators.filter((x) => x !== id) })}>
+                  <UserMinus className="size-3 text-muted-foreground" />
+                  {c.name}
+                </Tag>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </FormSection>
   );
 }

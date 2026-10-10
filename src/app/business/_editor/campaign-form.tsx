@@ -7,18 +7,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { SelectableCard } from "@/components/selectable-card";
 import { Photo } from "@/components/app/photo";
 import { OBJECTIVES } from "@/lib/domain/labels";
-import type { Objective } from "@/lib/domain/types";
+import type { Campaign, Guarantee, Objective } from "@/lib/domain/types";
+import { REMEDIES } from "@/lib/domain/labels";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { FieldLabel, FormSection, Helper, MoneyInput } from "./form-section";
-import type { StepProps } from "./builder-state";
 
 const OBJ_ICON: Record<Objective, typeof Sparkles> = { awareness: Sparkles, traffic: MousePointerClick, leads: UserPlus, sales: ShoppingBag, app: Download };
 const IMAGES = ["c-brushes", "c-serum-white", "c-jars", "c-pump", "c-tube", "c-amber"];
 
-export function StepBasics({ draft, mode, setCampaign }: StepProps) {
-  const c = draft.campaign;
-  const update = (patch: Partial<typeof c>) => setCampaign((x) => ({ ...x, ...patch }));
-  const promo = (patch: Partial<typeof c.promoting>) => setCampaign((x) => ({ ...x, promoting: { ...x.promoting, ...patch } }));
+export function CampaignForm({ campaign: c, onChange, live = false }: { campaign: Campaign; onChange: (fn: (c: Campaign) => Campaign) => void; live?: boolean }) {
+  const update = (patch: Partial<Campaign>) => onChange((x) => ({ ...x, ...patch }));
+  const promo = (patch: Partial<Campaign["promoting"]>) => onChange((x) => ({ ...x, promoting: { ...x.promoting, ...patch } }));
   const days = Math.round((new Date(c.endDate).getTime() - new Date(c.startDate).getTime()) / 86_400_000);
 
   return (
@@ -27,13 +27,13 @@ export function StepBasics({ draft, mode, setCampaign }: StepProps) {
         <Input className="h-9" value={c.name} onChange={(e) => update({ name: e.target.value })} placeholder="e.g. Spring lip oil launch" aria-label="Campaign name" />
       </FormSection>
 
-      <FormSection title="Objective" description="Sets the main metric in your reports. Guarantees are always on verified organic views; sales, leads and installs are tracked, not guaranteed.">
+      <FormSection title="Objective" description={live ? "The objective can't change after a campaign is published." : "Sets the main metric in your reports. Guarantees are always on verified organic views; sales, leads and installs are tracked, not guaranteed."}>
         <div role="radiogroup" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {(Object.keys(OBJECTIVES) as Objective[]).map((o) => {
             const Icon = OBJ_ICON[o];
             const selected = c.objective === o;
             return (
-              <SelectableCard key={o} selected={selected} onSelect={() => update({ objective: o })}>
+              <SelectableCard key={o} selected={selected} disabled={live && !selected} onSelect={() => update({ objective: o })}>
                 <span className={cn("flex size-9 items-center justify-center rounded-lg bg-muted text-muted-foreground", selected && "bg-primary text-primary-foreground")}>
                   <Icon className="size-[18px]" />
                 </span>
@@ -127,7 +127,7 @@ export function StepBasics({ draft, mode, setCampaign }: StepProps) {
         {c.budget < 500 && <Helper className="text-destructive">Minimum budget is $500.</Helper>}
         {days <= 0 && <Helper className="text-destructive">End date must be after the start date.</Helper>}
 
-        {mode === "advanced" ? (
+        {(
           <div className="mt-5">
             <FieldLabel>Budget allocation across creator sets</FieldLabel>
             <div className="grid gap-2 sm:grid-cols-2">
@@ -145,10 +145,27 @@ export function StepBasics({ draft, mode, setCampaign }: StepProps) {
             </div>
             <Helper>Reallocation only applies to uncommitted budget and future invitations. Accepted creator fees never change.</Helper>
           </div>
-        ) : (
-          <Helper>Budget is allocated automatically. Switch to Advanced to split it manually across creator sets.</Helper>
         )}
       </FormSection>
+
+      {c.guarantee && (
+        <FormSection title="Delivery guarantee" description="A minimum number of verified organic views across the campaign, set from your creators' typical results when you publish.">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <FieldLabel>If delivery falls short</FieldLabel>
+              <Select value={c.guarantee.remedy} onValueChange={(v) => update({ guarantee: { ...c.guarantee!, remedy: v as Guarantee["remedy"] } })}>
+                <SelectTrigger className="h-9 w-full"><SelectValue /></SelectTrigger>
+                <SelectContent>{(Object.keys(REMEDIES) as Guarantee["remedy"][]).map((r) => <SelectItem key={r} value={r}>{REMEDIES[r]}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div>
+              <FieldLabel>Measurement window</FieldLabel>
+              <p className="flex h-9 items-center text-sm">{c.guarantee.windowDays} days from each post · organic views only</p>
+            </div>
+          </div>
+          <Helper>Paid boosts, removed posts and fraudulent views never count. Sales, leads and installs are tracked, not guaranteed.</Helper>
+        </FormSection>
+      )}
     </div>
   );
 }

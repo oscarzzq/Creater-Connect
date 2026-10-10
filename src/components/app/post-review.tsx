@@ -11,6 +11,7 @@ import { actions, useAppState } from "@/lib/store";
 import { creatorById } from "@/lib/domain/creators";
 import { compact, pct, shortDate } from "@/lib/domain/format";
 import { CTAS, OBJECTIVES } from "@/lib/domain/labels";
+import { briefFor } from "@/lib/domain/matching";
 import { cn } from "@/lib/utils";
 import { Photo } from "./photo";
 import { CreatorPhoto } from "./creator-photo";
@@ -28,7 +29,7 @@ export function PostReview({
   onOpenChange: (o: boolean) => void;
   onOpenActivation: (id: string) => void;
 }) {
-  const { posts, campaigns, activations } = useAppState();
+  const { posts, campaigns, activations, sets } = useAppState();
   const [playing, setPlaying] = useState(true);
   const [revising, setRevising] = useState(false);
   const [note, setNote] = useState("");
@@ -39,7 +40,7 @@ export function PostReview({
   const creator = creatorById(post.creatorId);
   const total = posts.filter((p) => p.activationId === post.activationId).length;
   const m = post.metrics;
-  const brief = campaign.brief;
+  const brief = briefFor(campaign, sets.find((s) => s.id === post.setId));
   const started = post.status !== "not_started";
   const first = creator?.name.split(" ")[0];
 

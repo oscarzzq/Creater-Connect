@@ -36,7 +36,7 @@ export function payment(act: Activation, posts: Post[]): { state: PaymentState; 
 // Stage
 
 export function campaignStage(c: Campaign, acts: Activation[], posts: Post[]): CampaignStage {
-  if (c.status === "draft") return acts.some((a) => a.campaignId === c.id) ? "awaiting_approval" : "matching";
+  if (c.status === "draft") return "draft";
   if (c.status === "cancelled" || c.status === "completed" || c.status === "make_good") return c.status;
   const mine = acts.filter((a) => a.campaignId === c.id);
   const ps = posts.filter((p) => p.campaignId === c.id);
@@ -45,9 +45,10 @@ export function campaignStage(c: Campaign, acts: Activation[], posts: Post[]): C
   if (ps.some((p) => p.status === "approved")) return "publishing";
   const accepted = mine.filter((a) => a.status === "accepted").length;
   const invited = mine.filter((a) => a.status === "invited").length;
+  if (mine.some((a) => a.status === "recommended") && !accepted && !invited) return "awaiting_approval";
   if (accepted && accepted >= invited) return "in_production";
   if (invited) return "inviting";
-  return "awaiting_approval";
+  return mine.some((a) => a.status === "recommended") ? "awaiting_approval" : "matching";
 }
 
 // ---------------------------------------------------------------------------
@@ -256,14 +257,13 @@ export function inboxItems(w: World, businessId: string): InboxItem[] {
     const acts = w.activations.filter((a) => a.campaignId === c.id);
     const ps = w.posts.filter((p) => p.campaignId === c.id);
 
-    if (c.status === "draft") {
-      const recs = acts.filter((a) => a.status === "recommended");
-      if (recs.length)
-        items.push({
-          id: `recs-${c.id}`, category: "offers", needsAction: true, kind: "review_recommendations",
-          title: `${recs.length} recommended creators ready for review`, body: `${c.name} · approve the roster, then launch`, at: c.createdAt, campaignId: c.id,
-        });
-    }
+    // Manual creator sets wait for the brand to approve recommendations.
+    const recs = acts.filter((a) => a.status === "recommended" && !a.replacementFor);
+    if (recs.length)
+      items.push({
+        id: `recs-${c.id}-${recs.length}`, category: "offers", needsAction: true, kind: "review_recommendations",
+        title: `${recs.length} recommended creators to approve`, body: `${c.name} · manual creator selection`, at: c.launchedAt ?? c.createdAt, campaignId: c.id, setId: recs[0].setId,
+      });
 
     for (const a of acts) {
       const base = { campaignId: c.id, setId: a.setId, activationId: a.id, creatorId: a.creatorId };
@@ -279,8 +279,14 @@ export function inboxItems(w: World, businessId: string): InboxItem[] {
         items.push({ ...base, id: `acc-${a.id}`, category: "offers", needsAction: false, kind: "accepted", title: `${name(a.creatorId)} accepted your offer`, body: `${usd(a.fee)} · ${c.name}`, at: a.respondedAt });
       if ((a.status === "declined" || a.status === "replacement_required") && a.respondedAt && !acts.some((x) => x.replacementFor === a.id && x.status === "recommended"))
         items.push({ ...base, id: `dec-${a.id}`, category: "offers", needsAction: false, kind: "declined", title: `${name(a.creatorId)} declined`, body: `${a.declineReason ?? "No reason given"} · ${c.name}`, at: a.respondedAt });
-      if (a.status === "invited" && a.invitedAt)
-        items.push({ ...base, id: `inv-${a.id}`, category: "offers", needsAction: false, kind: "invited", title: `Offer sent to ${name(a.creatorId)}`, body: `Expires ${a.expiresAt ? daysLeftLabel(a.expiresAt) : ""} · ${c.name}`, at: a.invitedAt });
+      if (a.status === "invited" && a.invitedAt) {
+        const old = a.replacementFor ? acts.find((x) => x.id === a.replacementFor) : undefined;
+        items.push({
+          ...base, id: `inv-${a.id}`, category: "offers", needsAction: false, kind: "invited",
+          title: old ? `${first(old.creatorId)} ${old.status === "removed" ? "removed" : "declined"} · ${name(a.creatorId)} invited instead` : `Offer sent to ${name(a.creatorId)}`,
+          body: `${old ? "Automatic replacement · " : ""}Expires ${a.expiresAt ? daysLeftLabel(a.expiresAt) : ""} · ${c.name}`, at: a.invitedAt,
+        });
+      }
       const last = a.messages.at(-1);
       if (last)
         items.push({
