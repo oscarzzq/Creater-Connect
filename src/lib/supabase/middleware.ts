@@ -37,7 +37,11 @@ export async function updateSession(request: NextRequest) {
   );
 
   // Refresh session if expired — required for Server Components
-  await supabase.auth.getUser();
+  try {
+    await supabase.auth.getUser();
+  } catch {
+    // Supabase unreachable: continue signed out rather than failing the request.
+  }
 
   return supabaseResponse;
 }
