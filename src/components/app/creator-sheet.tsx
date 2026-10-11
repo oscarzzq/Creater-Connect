@@ -1,11 +1,12 @@
 "use client";
 
-import { MapPin, Star, Timer } from "lucide-react";
+import { CalendarCheck, MapPin, RefreshCw, Star, Timer } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { PLATFORMS, PlatformIcon } from "@/components/platform-icon";
 import { useAppState } from "@/lib/store";
 import { creatorById } from "@/lib/domain/creators";
 import { matchCreator } from "@/lib/domain/matching";
+import { ANALYTICS_SOURCE, creatorAnalytics, targetAudienceShare } from "@/lib/domain/analytics";
 import { COUNTRY_FLAGS, COUNTRY_NAMES, compact, usd } from "@/lib/domain/format";
 import { NICHE_LABEL } from "@/lib/domain/labels";
 import { BUSINESS } from "@/lib/domain/seed";
@@ -44,6 +45,11 @@ export function CreatorSheet({
     .map((a) => ({ a, c: campaigns.find((c) => c.id === a.campaignId) }))
     .filter((h) => h.c?.businessId === BUSINESS.id);
   const ages = Object.entries(creator.audience.ages);
+  const an = creatorAnalytics(creator);
+  const target = set ? targetAudienceShare(creator, set) : null;
+  const sources = creator.platforms.map((p) => ANALYTICS_SOURCE[p.platform]).join(", ");
+  const maxView = Math.max(...an.recent.views);
+  const maxHour = Math.max(...an.activeHours);
   const maxAge = Math.max(...ages.map(([, v]) => v));
 
   return (
@@ -91,12 +97,39 @@ export function CreatorSheet({
               </span>
             ))}
           </div>
+          <p className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-success-subtle/60 px-2 py-1 text-[11px] text-success-text">
+            <RefreshCw className="size-3" />
+            Connected accounts · data from {sources} · synced {an.syncedHoursAgo}h ago
+          </p>
         </div>
 
         <div className="space-y-6 px-6 py-6">
           {match && set && (
             <section>
               <h3 className="mb-2 text-sm font-semibold">Fit for “{set.name}”</h3>
+              {target && (
+                <div className="mb-3 flex items-center gap-4 rounded-xl border p-3.5">
+                  <div>
+                    <div className="text-2xl font-semibold tracking-tight tabular-nums">{target.pct}%</div>
+                    <div className="text-[11px] text-muted-foreground">of audience in your target</div>
+                  </div>
+                  <div className="flex-1 space-y-1 text-xs">
+                    {(
+                      [
+                        [set.demographics.gender === "all" ? "Any gender" : set.demographics.gender === "women" ? "Women" : "Men", target.genderShare],
+                        [`Aged ${set.demographics.ageMin}–${set.demographics.ageMax}`, target.ageShare],
+                        [set.audienceGeo.length ? `In ${set.audienceGeo.join(", ")}` : "Any country", target.geoShare],
+                      ] as const
+                    ).map(([label, v]) => (
+                      <div key={label} className="flex items-center gap-2">
+                        <span className="w-24 truncate text-muted-foreground">{label}</span>
+                        <div className="h-1.5 flex-1 bg-muted"><div className="h-full bg-chart-1" style={{ width: `${v}%` }} /></div>
+                        <span className="w-8 text-right tabular-nums">{v}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               <MatchBreakdown match={match} />
               {match.quote && (
                 <dl className="mt-3 grid grid-cols-3 gap-px overflow-hidden rounded-xl border bg-border text-sm">
@@ -120,6 +153,40 @@ export function CreatorSheet({
               )}
             </section>
           )}
+
+          <section>
+            <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
+              Content performance <DataTag kind="verified" />
+            </h3>
+            <div className="rounded-xl border p-4">
+              <div className="flex items-baseline justify-between text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5">
+                  <PlatformIcon platform={an.recent.platform} className="size-3.5" />
+                  {PLATFORMS[an.recent.platform].unit[0].toUpperCase() + PLATFORMS[an.recent.platform].unit.slice(1)} on last 20 posts
+                </span>
+                <span>median {compact(an.recent.median)}</span>
+              </div>
+              <div className="relative mt-3 flex h-20 items-end gap-[3px]" role="img" aria-label={`${PLATFORMS[an.recent.platform].unit} on last 20 posts, median ${compact(an.recent.median)}`}>
+                <div className="pointer-events-none absolute inset-x-0 border-t border-dashed border-foreground/30" style={{ bottom: `${(an.recent.median / maxView) * 100}%` }} />
+                {an.recent.views.map((v, i) => (
+                  <div key={i} title={`${compact(v)} ${PLATFORMS[an.recent.platform].unit}`} className="flex-1 rounded-t-[2px] bg-chart-1/80 hover:bg-chart-1" style={{ height: `${Math.max(4, (v / maxView) * 100)}%` }} />
+                ))}
+              </div>
+              <dl className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+                {(
+                  [
+                    ...an.contentStats.map((s) => [s.label, s.value] as const),
+                    ["Audience growth, 30d", `+${an.followerGrowth30d}%`],
+                  ] as const
+                ).map(([label, value]) => (
+                  <div key={label}>
+                    <dt className="text-[11px] text-muted-foreground">{label}</dt>
+                    <dd className="font-semibold tabular-nums">{value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </section>
 
           <section>
             <h3 className="mb-2 text-sm font-semibold">Recent organic performance</h3>
@@ -152,7 +219,7 @@ export function CreatorSheet({
                 </tbody>
               </table>
             </div>
-            <p className="mt-1.5 text-xs text-muted-foreground">Last 20 organic videos. Typical range is the middle 50% of results.</p>
+            <p className="mt-1.5 text-xs text-muted-foreground">Last 20 organic posts. LinkedIn counts impressions and newsletters count opens. Typical range is the middle 50% of results.</p>
           </section>
 
           <section>
@@ -203,13 +270,97 @@ export function CreatorSheet({
                     </div>
                   ))}
                 </div>
+                <div className="mt-4 text-xs text-muted-foreground">Top cities</div>
+                <ul className="mt-1.5 space-y-1 text-sm">
+                  {an.topCities.map((c) => (
+                    <li key={c.name} className="flex items-center justify-between">
+                      <span>{c.name}</span>
+                      <span className="text-muted-foreground tabular-nums">{c.pct}%</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <div className="mt-3 grid gap-4 rounded-xl border p-4 sm:grid-cols-2">
+              <div>
+                <div className="flex items-baseline justify-between text-xs text-muted-foreground">
+                  <span>When their audience is active</span>
+                  <span className="font-medium text-foreground">{an.peakWindow}</span>
+                </div>
+                <div className="mt-2 flex h-12 items-end gap-px" role="img" aria-label={`Audience most active ${an.peakWindow}`}>
+                  {an.activeHours.map((v, h) => (
+                    <div key={h} title={`${h}:00 · ${v}%`} className="flex-1 bg-chart-2/80" style={{ height: `${(v / maxHour) * 100}%` }} />
+                  ))}
+                </div>
+                <div className="mt-1 flex justify-between text-[10px] text-muted-foreground tabular-nums">
+                  <span>12am</span><span>6am</span><span>12pm</span><span>6pm</span><span>11pm</span>
+                </div>
+                <div className="mt-4 text-xs text-muted-foreground">Viewers</div>
+                <div className="mt-2 flex h-2 gap-0.5 overflow-hidden">
+                  <div className="bg-chart-1" style={{ width: `${100 - an.returningPct}%` }} />
+                  <div className="flex-1 bg-chart-2" />
+                </div>
+                <div className="mt-1.5 flex justify-between text-xs">
+                  <span>New {100 - an.returningPct}%</span>
+                  <span>Returning {an.returningPct}%</span>
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">How viewers find them</div>
+                <ul className="mt-1.5 space-y-1.5">
+                  {an.traffic.map((t) => (
+                    <li key={t.label} className="flex items-center gap-2 text-xs">
+                      <span className="w-24 truncate">{t.label}</span>
+                      <div className="h-1.5 flex-1 bg-muted"><div className="h-full bg-chart-1" style={{ width: `${t.pct}%` }} /></div>
+                      <span className="w-8 text-right tabular-nums">{t.pct}%</span>
+                    </li>
+                  ))}
+                </ul>
+                {an.interests.length > 0 && (
+                  <>
+                    <div className="mt-4 text-xs text-muted-foreground">Audience interests</div>
+                    <ul className="mt-1.5 space-y-1 text-sm">
+                      {an.interests.map((i) => (
+                        <li key={i.label} className="flex items-center justify-between">
+                          <span className="truncate">{i.label}</span>
+                          <span className="text-muted-foreground tabular-nums">{i.pct}%</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
               </div>
             </div>
           </section>
 
+          <section>
+            <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
+              <CalendarCheck className="size-4 text-muted-foreground" />
+              Reliability on Klynt
+            </h3>
+            <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border text-sm sm:grid-cols-4">
+              {(
+                [
+                  ["Posted on time", `${an.reliability.onTimePct}%`],
+                  ["Sponsored vs. usual views", an.reliability.sponsoredVsOrganicPct ? `${an.reliability.sponsoredVsOrganicPct}%` : "New"],
+                  ["Avg. revisions", `${an.reliability.avgRevisions}`],
+                  ["Campaigns done", `${an.reliability.campaigns}`],
+                ] as const
+              ).map(([label, value]) => (
+                <div key={label} className="bg-card p-3">
+                  <dt className="text-[11px] text-muted-foreground">{label}</dt>
+                  <dd className="font-semibold tabular-nums">{value}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="mt-1.5 text-xs text-muted-foreground">
+              {an.reliability.sponsoredVsOrganicPct ? `Their sponsored posts typically reach ${an.reliability.sponsoredVsOrganicPct}% of their usual organic views. ` : ""}Reliable creators get offers first.
+            </p>
+          </section>
+
           {creator.pastBrands.length > 0 && (
             <section>
-              <h3 className="mb-2 text-sm font-semibold">Previous brand collaborations</h3>
+              <h3 className="mb-2 text-sm font-semibold">Previous sponsorships</h3>
               <div className="flex flex-wrap gap-1.5">
                 {creator.pastBrands.map((b) => (
                   <span key={b} className="rounded-md border px-2 py-0.5 text-xs">

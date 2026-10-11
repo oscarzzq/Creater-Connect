@@ -3,22 +3,18 @@ import type { ActivationStatus, CampaignStage, CtaType, NicheId, Objective, Post
 export type Tone = "neutral" | "brand" | "success" | "warning" | "danger";
 
 export const NICHES: { id: NicheId; label: string }[] = [
-  { id: "fashion", label: "Fashion & Style" },
-  { id: "beauty", label: "Beauty & Skincare" },
-  { id: "fitness", label: "Fitness & Wellness" },
-  { id: "food", label: "Food & Beverage" },
-  { id: "tech", label: "Technology & Gadgets" },
-  { id: "gaming", label: "Gaming" },
-  { id: "education", label: "Education & Student Life" },
-  { id: "business", label: "Business & Entrepreneurship" },
-  { id: "finance", label: "Finance" },
-  { id: "lifestyle", label: "Travel & Lifestyle" },
-  { id: "home", label: "Home & Living" },
-  { id: "entertainment", label: "Entertainment & Comedy" },
-  { id: "parenting", label: "Parenting & Family" },
-  { id: "sports", label: "Sports" },
-  { id: "automotive", label: "Automotive" },
-  { id: "pets", label: "Pets" },
+  { id: "ai", label: "AI & Machine Learning" },
+  { id: "devtools", label: "Developer Tools" },
+  { id: "cloud", label: "Cloud & Infrastructure" },
+  { id: "security", label: "Cybersecurity" },
+  { id: "data", label: "Data & Analytics" },
+  { id: "saas", label: "Enterprise SaaS" },
+  { id: "fintech", label: "Fintech" },
+  { id: "product", label: "Product & Design" },
+  { id: "webdev", label: "Web Development" },
+  { id: "leadership", label: "Engineering Leadership" },
+  { id: "startups", label: "Startups & Founders" },
+  { id: "careers", label: "Tech Careers & Education" },
   { id: "other", label: "Other" },
 ];
 
@@ -26,11 +22,11 @@ export const NICHE_LABEL = Object.fromEntries(NICHES.map((n) => [n.id, n.label])
 
 /** The objective sets the primary reporting metric. Guarantees are always on organic views. */
 export const OBJECTIVES: Record<Objective, { label: string; description: string; result: string; resultPlural: string; tracking: string }> = {
-  awareness: { label: "Awareness", description: "Maximize organic views from the right audience.", result: "view", resultPlural: "Views", tracking: "Verified organic views" },
-  traffic: { label: "Website traffic", description: "Drive tracked visits to your site or landing page.", result: "visit", resultPlural: "Visits", tracking: "Tracked link clicks (UTM)" },
-  leads: { label: "Leads", description: "Generate signups, inquiries or registrations.", result: "lead", resultPlural: "Leads", tracking: "Form submissions via tracked link" },
-  sales: { label: "Sales", description: "Generate attributed purchases.", result: "purchase", resultPlural: "Purchases", tracking: "Promo code + tracked link purchases" },
-  app: { label: "App promotion", description: "Drive tracked app installs.", result: "install", resultPlural: "Installs", tracking: "Install attribution link" },
+  awareness: { label: "Awareness", description: "Reach the right professional audience with verified organic views.", result: "view", resultPlural: "Views", tracking: "Verified organic views" },
+  traffic: { label: "Website traffic", description: "Drive tracked visits to your site, docs or landing page.", result: "visit", resultPlural: "Visits", tracking: "Tracked link clicks (UTM)" },
+  leads: { label: "Leads", description: "Generate signups, trials or demo requests.", result: "lead", resultPlural: "Leads", tracking: "Form submissions via tracked link" },
+  sales: { label: "Sales", description: "Generate attributed purchases or paid upgrades.", result: "purchase", resultPlural: "Purchases", tracking: "Promo code + tracked link purchases" },
+  app: { label: "App promotion", description: "Drive tracked app or extension installs.", result: "install", resultPlural: "Installs", tracking: "Install attribution link" },
 };
 
 export const CTAS: Record<CtaType, string> = {
@@ -47,7 +43,7 @@ export const CTAS: Record<CtaType, string> = {
 export const STAGES: Record<CampaignStage, { label: string; tone: Tone }> = {
   draft: { label: "Draft", tone: "neutral" },
   matching: { label: "Matching", tone: "neutral" },
-  awaiting_approval: { label: "Awaiting your approval", tone: "warning" },
+  awaiting_approval: { label: "Matches pairing", tone: "warning" },
   inviting: { label: "Inviting creators", tone: "brand" },
   in_production: { label: "In production", tone: "brand" },
   awaiting_review: { label: "Awaiting content review", tone: "warning" },
@@ -59,7 +55,7 @@ export const STAGES: Record<CampaignStage, { label: string; tone: Tone }> = {
 };
 
 export const ACTIVATION_STATUS: Record<ActivationStatus, { label: string; tone: Tone; owner: string }> = {
-  recommended: { label: "Recommended", tone: "neutral", owner: "You: approve or remove" },
+  recommended: { label: "Matched · pairing", tone: "neutral", owner: "You: decline within 24h, or it pairs automatically" },
   approved: { label: "Approved", tone: "brand", owner: "Sent at launch" },
   invited: { label: "Invited", tone: "brand", owner: "Creator: accept or decline" },
   accepted: { label: "Accepted", tone: "success", owner: "Creator: producing" },

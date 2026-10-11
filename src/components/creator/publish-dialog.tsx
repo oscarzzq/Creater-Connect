@@ -44,7 +44,7 @@ function PublishForm({ post, campaign, onDone }: { post: Post; campaign: Campaig
 
   const steps = [
     `Post it on ${platform} from ${handle ?? "your own account"} as a normal organic post${post.dueAt ? ` by ${shortDate(post.dueAt)}` : ""}.`,
-    "Turn on the platform's paid-partnership label (or add #ad).",
+    "Disclose the partnership: turn on the platform's paid-partnership label (or add #ad).",
     "Don't boost or promote it. Only organic views count.",
     campaign.guarantee && `Keep it up for at least ${campaign.guarantee.windowDays} days while views are measured.`,
   ].filter((s): s is string => !!s);

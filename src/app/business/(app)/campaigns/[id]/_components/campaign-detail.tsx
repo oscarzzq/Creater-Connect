@@ -63,9 +63,9 @@ export function CampaignDetail({ params }: { params: Promise<{ id: string }> }) 
     campaign.status === "draft"
       ? { label: "Review & publish", icon: Rocket, run: () => router.push(`/business/campaigns/${campaign.id}/edit`) }
       : recommended.length
-        ? { label: `Approve ${recommended.length} creators`, icon: Users, run: () => goTo("sets", { set: recommended[0].setId }) }
+        ? { label: `Review ${recommended.length} new match${recommended.length > 1 ? "es" : ""}`, icon: Users, run: () => goTo("sets", { set: recommended[0].setId }) }
         : replacements.length
-        ? { label: `Approve ${replacements.length} replacement${replacements.length > 1 ? "s" : ""}`, icon: UserRoundPlus, run: () => goTo("roster", { status: "attention" }) }
+        ? { label: `Review ${replacements.length} replacement${replacements.length > 1 ? "s" : ""}`, icon: UserRoundPlus, run: () => goTo("roster", { status: "attention" }) }
         : toReview.length
           ? { label: `Review ${toReview.length} draft${toReview.length > 1 ? "s" : ""}`, icon: Eye, run: () => goTo("posts", { status: "draft_submitted" }) }
           : questions.length

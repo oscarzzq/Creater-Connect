@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { OfferDetail } from "../../_components/offer-detail";
 
-export const metadata: Metadata = { title: "Offer · Creator Connect" };
+export const metadata: Metadata = { title: "Offer · Klynt" };
 
 export default function CreatorOfferPage({ params }: PageProps<"/creator/offers/[id]">) {
   return (

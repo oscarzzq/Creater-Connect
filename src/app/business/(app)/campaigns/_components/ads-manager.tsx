@@ -287,7 +287,7 @@ export function AdsManager() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Campaigns</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Every campaign, creator set and post, on one shared data model.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Every creator-led campaign, creator set and post, on one shared data model.</p>
         </div>
         <Button asChild className="h-9">
           <Link href="/business/campaigns/new">

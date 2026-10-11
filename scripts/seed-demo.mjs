@@ -36,16 +36,16 @@ const PASSWORD = "demo1234";
   }
 }
 
-const BUSINESS = { email: "biz@demo.test", name: "Glow Inc.", role: "business" };
+const BUSINESS = { email: "biz@demo.test", name: "Kestrel AI", role: "business" };
 const CREATORS = [
-  { email: "maya@demo.test", name: "Maya Chen", niche: "beauty", followers: 182000, price_cents: 15000 },
-  { email: "jordan@demo.test", name: "Jordan Lee", niche: "fitness", followers: 95000, price_cents: 9000 },
-  { email: "sofia@demo.test", name: "Sofia Reyes", niche: "lifestyle", followers: 240000, price_cents: 22000 },
-  { email: "dev@demo.test", name: "Dev Patel", niche: "tech", followers: 120000, price_cents: 18000 },
-  { email: "ava@demo.test", name: "Ava Kim", niche: "food", followers: 67000, price_cents: 7000 },
-  { email: "liam@demo.test", name: "Liam Carter", niche: "travel", followers: 310000, price_cents: 30000 },
-  { email: "nora@demo.test", name: "Nora Ali", niche: "fashion", followers: 145000, price_cents: 16000 },
-  { email: "kai@demo.test", name: "Kai Wong", niche: "gaming", followers: 89000, price_cents: 11000 },
+  { email: "maya@demo.test", name: "Maya Chen", niche: "ai", followers: 182000, price_cents: 15000 },
+  { email: "jordan@demo.test", name: "Jordan Lee", niche: "devtools", followers: 95000, price_cents: 9000 },
+  { email: "sofia@demo.test", name: "Sofia Reyes", niche: "saas", followers: 240000, price_cents: 22000 },
+  { email: "dev@demo.test", name: "Dev Patel", niche: "devtools", followers: 120000, price_cents: 18000 },
+  { email: "ava@demo.test", name: "Ava Kim", niche: "data", followers: 67000, price_cents: 7000 },
+  { email: "liam@demo.test", name: "Liam Carter", niche: "cloud", followers: 310000, price_cents: 30000 },
+  { email: "nora@demo.test", name: "Nora Ali", niche: "product", followers: 145000, price_cents: 16000 },
+  { email: "kai@demo.test", name: "Kai Wong", niche: "security", followers: 89000, price_cents: 11000 },
 ];
 
 async function getAuthedClient(email) {
@@ -84,14 +84,14 @@ const ids = {};
   // 2. campaigns (insert missing by title — idempotent re-runs)
   const wanted = [
     {
-      business_id: user.id, title: "Glow Serum Launch",
-      brief: "30s TikTok + 1 IG Story. Hook in first 2s, show morning routine. #glowup",
-      budget_cents: 200000, niche_target: "beauty", min_followers: 50000, max_payout_cents: 20000, status: "active",
+      business_id: user.id, title: "Kestrel 2 Launch",
+      brief: "Short demo of Kestrel 2 on a real task from your own work. Hook in the first 2s, disclose with #ad.",
+      budget_cents: 200000, niche_target: "ai", min_followers: 50000, max_payout_cents: 20000, status: "active",
     },
     {
-      business_id: user.id, title: "Protein Bar Try-On",
-      brief: "Gym vlog integration, taste test on camera.",
-      budget_cents: 100000, niche_target: "fitness", min_followers: 30000, max_payout_cents: 12000, status: "active",
+      business_id: user.id, title: "Kestrel Code Trial",
+      brief: "Try Kestrel Code in your own editor on camera. Disclose with #ad.",
+      budget_cents: 100000, niche_target: "devtools", min_followers: 30000, max_payout_cents: 12000, status: "active",
     },
   ];
   const { data: existing } = await sb.from("campaigns").select("id,title").eq("business_id", user.id);
@@ -123,8 +123,8 @@ for (const c of CREATORS) {
 // 4. offers (as business client)
 {
   const sb = ids.bizClient;
-  const glow = ids.camps["Glow Serum Launch"];
-  const protein = ids.camps["Protein Bar Try-On"];
+  const glow = ids.camps["Kestrel 2 Launch"];
+  const protein = ids.camps["Kestrel Code Trial"];
   const rows = [
     { campaign_id: glow, creator_id: ids["maya@demo.test"], payout_cents: 15000, match_score: 96 },
     { campaign_id: glow, creator_id: ids["nora@demo.test"], payout_cents: 16000, match_score: 71 },

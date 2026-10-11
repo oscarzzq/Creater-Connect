@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { OverlayProvider } from "@/components/app/overlays";
 import { EditCampaign } from "./edit-campaign";
 
-export const metadata: Metadata = { title: "Edit campaign · Creator Connect" };
+export const metadata: Metadata = { title: "Edit campaign · Klynt" };
 
 export default function EditCampaignPage({ params }: PageProps<"/business/campaigns/[id]/edit">) {
   return (

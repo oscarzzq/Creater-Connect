@@ -86,7 +86,7 @@ export function AcceptDialog({ item, open, onOpenChange }: { item: CreatorItem; 
   }
 
   const rows = [
-    { icon: FileCheck2, title: deliverablesLabel(brief, a.platform), body: `${brief.videoLength} · posted organically from your account` },
+    { icon: FileCheck2, title: deliverablesLabel(brief, a.platform), body: `${brief.videoLength} · posted organically from your account, clearly disclosed` },
     { icon: CalendarClock, title: `Post by ${shortDate(due)}`, body: brief.deliverables > 1 ? `Later posts by ${shortDate(dueIfAcceptedToday(c, 2))}` : "14 days from today, within the campaign" },
     { icon: Package, title: ship.title, body: ship.body },
     { icon: ShieldCheck, title: rights.title, body: `${rights.body} ${review.title}.` },
@@ -138,7 +138,7 @@ export function AcceptDialog({ item, open, onOpenChange }: { item: CreatorItem; 
 
 // ---------------------------------------------------------------------------
 
-const REASONS = ["Fully booked", "Not a fit for my audience", "Timeline doesn't work", "Fee too low", "Don't use this kind of product"];
+const REASONS = ["Fully booked", "Not a fit for my audience", "Timeline doesn't work", "Fee too low", "Outside my area of expertise"];
 
 export function DeclineDialog({ item, open, onOpenChange }: { item: CreatorItem; open: boolean; onOpenChange: (o: boolean) => void }) {
   return (
@@ -165,7 +165,7 @@ function DeclineForm({ item, onDone }: { item: CreatorItem; onDone: () => void }
       <DialogHeader>
         <DialogTitle>Decline this offer?</DialogTitle>
         <DialogDescription>
-          {usd(a.fee)} from {c.businessName} for {c.name}. A reason is optional, but it helps us send you better-fitting offers.
+          {usd(a.fee)} from {c.businessName} for {c.name}. A reason is optional, but it helps the matching engine send you offers closer to your expertise and audience.
         </DialogDescription>
       </DialogHeader>
       <div role="group" aria-label="Reason (optional)" className="flex flex-wrap gap-2">

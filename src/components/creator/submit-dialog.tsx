@@ -39,7 +39,7 @@ function SubmitForm({ post, campaign, onDone }: { post: Post; campaign: Campaign
   const captionId = useId();
   const checkId = useId();
   const what = `${PLATFORMS[post.platform].format}${post.index > 1 || brief.deliverables > 1 ? ` ${post.index}` : ""}`;
-  const fileName = `${campaign.promoting.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${post.index}-v${nextVersion}.mp4`;
+  const fileName = `${campaign.promoting.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${post.index}-v${nextVersion}.${brief.format === "video" ? "mp4" : "pdf"}`;
 
   const checklist = [
     brief.mandatoryDemo && `Demo: ${brief.mandatoryDemo}`,
@@ -122,9 +122,9 @@ function SubmitForm({ post, campaign, onDone }: { post: Post; campaign: Campaign
               <CloudUpload className="size-5" />
             </span>
             <span className="mt-3 text-sm font-medium">
-              Drop your video here or <span className="text-primary">browse</span>
+              Drop your draft here or <span className="text-primary">browse</span>
             </span>
-            <span className="mt-1 text-xs text-muted-foreground">MP4 or MOV · 9:16 · {brief.videoLength} · demo, nothing is uploaded</span>
+            <span className="mt-1 text-xs text-muted-foreground">Video, image, PDF or doc · {brief.videoLength} · demo, nothing is uploaded</span>
           </button>
         )}
 
@@ -137,7 +137,7 @@ function SubmitForm({ post, campaign, onDone }: { post: Post; campaign: Campaign
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
             rows={3}
-            placeholder={`Write the caption you'll use${brief.requiredMentions.length ? `, including ${brief.requiredMentions.join(" ")}` : ""}.`}
+            placeholder={`Write the caption you'll use${brief.requiredMentions.length ? `, including ${brief.requiredMentions.join(" ")}` : ""}. Disclose the partnership, e.g. #ad.`}
             className="mt-1.5 resize-none"
           />
         </div>

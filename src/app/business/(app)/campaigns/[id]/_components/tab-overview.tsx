@@ -156,7 +156,7 @@ export function OverviewTab({ campaign, sets, activations, posts, rollup: r, goT
             ))}
           </ul>
           <p className="mt-4 border-t pt-3 text-xs text-muted-foreground">
-            Includes a {PLATFORM_FEE_RATE * 100}% platform fee on creator fees.{" "}
+            Includes Klynt&apos;s {PLATFORM_FEE_RATE * 100}% fee on the creator prices you set.{" "}
             {campaign.allocation === "automatic" ? "Uncommitted budget is allocated automatically to future invitations; accepted fees never change." : "Allocated manually per creator set."}
           </p>
           {r.results > 0 && (

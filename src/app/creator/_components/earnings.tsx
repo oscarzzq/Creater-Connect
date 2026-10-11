@@ -190,7 +190,7 @@ function Accounts({ creator }: { creator: Creator }) {
         <h2 id="accounts-h" className="text-sm font-semibold">
           Connected accounts
         </h2>
-        <p className="mt-0.5 text-xs text-muted-foreground">Read-only. Offers are priced from your median organic views (last 20 videos).</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">Read-only. Businesses set each offer&apos;s price; your median organic reach (last 20 posts) decides which offers you&apos;re matched to.</p>
       </div>
       <ul className="mt-3 divide-y border-t">
         {PLATFORM_ORDER.map((p) => {
@@ -253,7 +253,7 @@ function Audience({ creator }: { creator: Creator }) {
         </h2>
         {verified ? <DataTag kind="verified" /> : <StatusPill tone="warning">Not verified</StatusPill>}
       </div>
-      <p className="mt-0.5 text-xs text-muted-foreground">Across your connected accounts. This is what brands are matched against.</p>
+      <p className="mt-0.5 text-xs text-muted-foreground">Across your connected accounts. The matching engine scores campaign fit against this.</p>
       <div className="mt-4 grid gap-5 sm:grid-cols-2">
         <div>
           <div className="text-xs text-muted-foreground">Gender</div>

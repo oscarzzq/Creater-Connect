@@ -100,7 +100,7 @@ export function Overview() {
         </Link>
         <KpiCard
           label="Amount spent"
-          info="Creator fees plus the 10% platform fee, charged when a creator's posts are verified. Committed fees aren't spent yet."
+          info="The creator prices you set plus Klynt's 1% fee, charged when a creator's posts are verified. Committed fees aren't spent yet."
           value={usd(d.totals.spend)}
           sub={`${usd(d.committed - d.spentAll)} committed, not yet due`}
         />
@@ -189,7 +189,7 @@ export function Overview() {
 
       {d.own.length === 0 && (
         <div className="surface flex flex-col items-center gap-3 p-10 text-center">
-          <p className="text-sm text-muted-foreground">Launch your first campaign to see results here.</p>
+          <p className="text-sm text-muted-foreground">Launch your first creator-led campaign to reach professional audiences through trusted industry creators. Results show up here.</p>
           <Button asChild>
             <Link href="/business/campaigns/new">
               <Plus />

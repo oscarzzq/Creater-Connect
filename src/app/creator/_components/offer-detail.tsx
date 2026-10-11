@@ -279,7 +279,7 @@ function Deliverables({ item }: { item: CreatorItem }) {
           <h2 id="deliver-h" className="text-sm font-semibold">
             What you&apos;ll deliver
           </h2>
-          <p className="text-xs text-muted-foreground">Posted organically from your {PLATFORMS[a.platform].label} account</p>
+          <p className="text-xs text-muted-foreground">Posted organically from your {PLATFORMS[a.platform].label} account, clearly disclosed</p>
         </div>
       </div>
       <dl className="mt-3 divide-y border-t">
@@ -352,7 +352,7 @@ function CreativeBrief({ item }: { item: CreatorItem }) {
         <div>
           <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
             <Lightbulb className="size-3.5" />
-            Hook ideas · optional, use your own if you prefer
+            Hook ideas · optional, use your own angle if you prefer
           </div>
           <ul className="mt-1.5 flex flex-wrap gap-1.5">
             {b.hooks.map((h) => (
@@ -437,7 +437,7 @@ const CREATOR_FACTOR_LABEL: Record<string, string> = {
 function WhyYou({ item }: { item: CreatorItem }) {
   const match = matchFor(item);
   if (!match) return null;
-  // Cost efficiency is priced for the brand (incl. platform fee), so it isn't shown to creators.
+  // Cost efficiency is priced for the brand (incl. Klynt fee), so it isn't shown to creators.
   const factors = match.factors.filter((f) => f.key !== "efficiency");
   return (
     <section className="surface p-4 sm:p-5" aria-labelledby="why-h">

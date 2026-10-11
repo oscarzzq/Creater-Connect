@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Inbox } from "./inbox";
 
-export const metadata: Metadata = { title: "Inbox · Creator Connect" };
+export const metadata: Metadata = { title: "Inbox · Klynt" };
 
 export default function InboxPage() {
   return (

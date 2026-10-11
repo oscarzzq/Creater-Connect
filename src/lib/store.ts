@@ -13,8 +13,8 @@ import type { World } from "./domain/metrics";
 
 export type AppState = World;
 
-// Bump when seed data changes so browsers drop stale saved state (v4: people-free thumbnails)
-const KEY = "cc-store-v4";
+// Bump when seed data changes so browsers drop stale saved state (v5: 24h auto-pairing; v6: B2B rebrand; v7: LinkedIn, X, YouTube, newsletters; v8: business-set prices)
+const KEY = "cc-store-v8";
 const SEED: AppState = {
   campaigns: SEED_CAMPAIGNS,
   sets: SEED_SETS,
@@ -107,6 +107,22 @@ export function plusDays(iso: string, days: number, endOfDay = false) {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${endOfDay ? "23:59:00" : `${p(d.getHours())}:${p(d.getMinutes())}:00`}`;
 }
 
+/** Hours a new match waits for the brand to decline before it pairs automatically. */
+export const PAIR_WINDOW_HOURS = 24;
+
+/** Review deadline for a match made now. Uses the demo clock so countdowns read "24h". */
+export function pairDeadline() {
+  const d = new Date(TODAY.getTime() + PAIR_WINDOW_HOURS * 3_600_000);
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:00`;
+}
+
+/** Whole hours left in a match's review window on the demo clock. */
+export function hoursToPair(a: Pick<Activation, "autoPairAt">) {
+  if (!a.autoPairAt) return null;
+  return Math.max(0, Math.ceil((new Date(a.autoPairAt).getTime() - TODAY.getTime()) / 3_600_000));
+}
+
 function expireStale(s: AppState): AppState {
   if (!s.activations.some((a) => a.status === "invited" && a.expiresAt && daysBetween(TODAY, a.expiresAt) < 0)) return s;
   return {
@@ -140,6 +156,7 @@ export function activationFromMatch(set: CreatorSet, campaign: Campaign, creator
     matchScore: m.score,
     fulfillment: "not_needed",
     messages: [],
+    autoPairAt: pairDeadline(),
     ...extra,
   };
 }
@@ -156,7 +173,7 @@ function postsFor(a: Activation, c: Campaign, set: CreatorSet | undefined, at: s
     platform: a.platform,
     index: i + 1,
     status: "not_started" as const,
-    thumbnail: creator?.samples[i % creator.samples.length] ?? "c-flatlay",
+    thumbnail: creator?.samples[i % creator.samples.length] ?? "t-laptop-code",
     caption: "",
     duration: 35,
     dueAt: i === 0 ? due : [plusDays(at, 21, true), c.endDate].sort()[0],
@@ -165,33 +182,27 @@ function postsFor(a: Activation, c: Campaign, set: CreatorSet | undefined, at: s
 }
 
 /**
- * A creator leaves the roster (declined, or excluded by the brand). Automatic sets invite a
- * comparable replacement straight away; manual sets queue one for the brand to approve.
+ * A creator leaves the roster (they declined, or the brand declined them). A comparable
+ * replacement is matched straight away and gets its own 24-hour review window.
  */
 function replaceCreator(s: AppState, a: Activation, c: Campaign, reason: "declined" | "excluded", at: string, note?: string): AppState {
   const set = s.sets.find((x) => x.id === a.setId);
-  const auto = set?.selection === "automatic";
-  let next = patchAct(s, a.id, (x) =>
-    reason === "excluded"
-      ? { ...x, status: "removed" }
-      : { ...x, status: c.status === "active" && !auto ? "replacement_required" : "declined", respondedAt: at, declineReason: note }
-  );
+  let next = patchAct(s, a.id, (x) => (reason === "excluded" ? { ...x, status: "removed" } : { ...x, status: "declined", respondedAt: at, declineReason: note }));
   if (reason === "excluded" && set) next = { ...next, sets: next.sets.map((x) => (x.id === set.id ? { ...x, excludeCreators: [...new Set([...x.excludeCreators, a.creatorId])] } : x)) };
   if (c.status !== "active" || !set) return next;
   const fresh = next.sets.find((x) => x.id === set.id)!;
   const pick = suggestReplacement(fresh, c, next.activations.filter((x) => x.campaignId === c.id).map((x) => x.creatorId), a.fee);
   const repl = pick && activationFromMatch(fresh, c, pick.creator.id, { replacementFor: a.id });
-  if (!repl) return next;
-  return { ...next, activations: [...next.activations, auto ? invite(repl, at) : repl] };
+  if (!repl) return reason === "declined" ? patchAct(next, a.id, (x) => ({ ...x, status: "replacement_required" })) : next;
+  return { ...next, activations: [...next.activations, repl] };
 }
 
-/** Matching runs at publish: automatic sets invite their roster, manual sets get recommendations to approve. */
-function rosterFor(s: AppState, c: Campaign, set: CreatorSet, budget: number, at: string): Activation[] {
+/** Matching runs at publish. Each match waits 24 hours for the brand to decline, then pairs. */
+function rosterFor(s: AppState, c: Campaign, set: CreatorSet, budget: number): Activation[] {
   const taken = s.activations.filter((a) => a.campaignId === c.id && a.status !== "removed").map((a) => a.creatorId);
   return recommendRoster(set, c, budget, taken)
     .map((m) => activationFromMatch(set, c, m.creator.id))
-    .filter((a): a is Activation => !!a)
-    .map((a) => (set.selection === "automatic" ? invite(a, at) : a));
+    .filter((a): a is Activation => !!a);
 }
 
 function setBudgetOf(c: Campaign, sets: CreatorSet[], set: CreatorSet) {
@@ -202,7 +213,7 @@ function setBudgetOf(c: Campaign, sets: CreatorSet[], set: CreatorSet) {
 // Business actions
 
 export const actions = {
-  /** Approve recommended creators. In a live campaign they're invited immediately. */
+  /** Pair matched creators now instead of waiting out the review window. */
   approve(ids: string[]) {
     const at = nowIso();
     setState((s) => {
@@ -273,7 +284,7 @@ export const actions = {
       const sets = next.sets.filter((x) => x.campaignId === campaignId);
       for (const set of sets) {
         if (next.activations.some((a) => a.setId === set.id && a.status !== "removed")) continue;
-        next = { ...next, activations: [...next.activations, ...rosterFor(next, live, set, setBudgetOf(live, sets, set), at)] };
+        next = { ...next, activations: [...next.activations, ...rosterFor(next, live, set, setBudgetOf(live, sets, set))] };
       }
       // Guarantee floor is set from the creators actually invited.
       const invited = next.activations.filter((a) => a.campaignId === campaignId && (a.status === "invited" || a.status === "recommended") && !a.supplementary);
@@ -287,7 +298,6 @@ export const actions = {
 
   /** Save edits from the campaign editor. New sets without creators are matched right away on live campaigns. */
   applyEdits(campaign: Campaign, sets: CreatorSet[]) {
-    const at = nowIso();
     setState((s) => {
       const keepIds = new Set(sets.map((x) => x.id));
       let next: AppState = {
@@ -300,38 +310,50 @@ export const actions = {
       if (campaign.status === "active") {
         for (const set of sets) {
           if (next.activations.some((a) => a.setId === set.id && a.status !== "removed")) continue;
-          next = { ...next, activations: [...next.activations, ...rosterFor(next, campaign, set, setBudgetOf(campaign, sets, set), at)] };
+          next = { ...next, activations: [...next.activations, ...rosterFor(next, campaign, set, setBudgetOf(campaign, sets, set))] };
         }
       }
       return next;
     });
   },
 
-  /** Remove a creator who hasn't accepted yet; automatic sets invite a comparable replacement. */
-  exclude(actId: string) {
+  /** Decline a creator who hasn't accepted yet; a comparable replacement is matched. Returns the replacement, if any. */
+  exclude(actId: string): Activation | undefined {
     const at = nowIso();
+    let replacement: Activation | undefined;
     setState((s) => {
       const a = s.activations.find((x) => x.id === actId);
       const c = a && s.campaigns.find((x) => x.id === a.campaignId);
       if (!a || !c || a.status === "accepted") return s;
-      return replaceCreator(s, a, c, "excluded", at);
+      const next = replaceCreator(s, a, c, "excluded", at);
+      replacement = next.activations.find((x) => x.replacementFor === a.id && x.status === "recommended");
+      return next;
     });
+    return replacement;
+  },
+
+  /** Demo: fast-forward a campaign's review windows so pending matches pair now. */
+  simulatePairing(campaignId: string) {
+    const at = nowIso();
+    setState((s) => ({
+      ...s,
+      activations: s.activations.map((a) => (a.campaignId === campaignId && a.status === "recommended" && a.autoPairAt ? invite(a, at) : a)),
+    }));
   },
 
   setNotes(actId: string, notes: string) {
     setState((s) => patchAct(s, actId, (a) => ({ ...a, notes })));
   },
 
-  /** Invite more creators into a set until its budget share is used. */
+  /** Match more creators into a set until its budget share is used. */
   fillRoster(setId: string) {
-    const at = nowIso();
     setState((s) => {
       const set = s.sets.find((x) => x.id === setId);
       const c = set && s.campaigns.find((x) => x.id === set.campaignId);
       if (!set || !c) return s;
       const sets = s.sets.filter((x) => x.campaignId === c.id);
       const used = withPlatformFee(s.activations.filter((a) => a.setId === setId && ["accepted", "invited", "approved", "recommended"].includes(a.status) && !a.supplementary).reduce((sum, a) => sum + a.fee, 0));
-      return { ...s, activations: [...s.activations, ...rosterFor(s, c, set, Math.max(0, setBudgetOf(c, sets, set) - used), at)] };
+      return { ...s, activations: [...s.activations, ...rosterFor(s, c, set, Math.max(0, setBudgetOf(c, sets, set) - used))] };
     });
   },
 

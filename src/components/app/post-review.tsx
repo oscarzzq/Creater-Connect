@@ -201,7 +201,7 @@ export function PostReview({
               {revising && (
                 <section>
                   <h3 className="mb-2 text-sm font-semibold">What should change?</h3>
-                  <Textarea autoFocus rows={3} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Be specific: timestamps, shots, wording. The creator sees exactly this." className="resize-none" />
+                  <Textarea autoFocus rows={3} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Be specific: timestamps, technical accuracy, wording. The creator sees exactly this." className="resize-none" />
                 </section>
               )}
             </div>

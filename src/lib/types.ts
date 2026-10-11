@@ -37,14 +37,14 @@ export interface Offer {
 }
 
 export const NICHE_OPTIONS = [
-  "lifestyle",
-  "fitness",
-  "beauty",
-  "tech",
-  "food",
-  "travel",
-  "fashion",
-  "gaming",
+  "ai",
+  "devtools",
+  "cloud",
+  "security",
+  "data",
+  "saas",
+  "fintech",
+  "product",
 ];
 
 export function formatMoney(cents: number) {

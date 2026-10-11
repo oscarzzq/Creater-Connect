@@ -44,9 +44,9 @@ export function CreatorShell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-dvh flex-col bg-canvas">
       <header className="sticky top-0 z-30 border-b bg-canvas/85 backdrop-blur-md">
         <div className="mx-auto flex h-14 w-full max-w-5xl items-center gap-2 px-4 sm:px-6">
-          <Link href="/creator" className="flex items-center gap-2 rounded-lg font-semibold tracking-tight outline-none focus-visible:ring-3 focus-visible:ring-ring/50" aria-label="Creator Connect inbox">
+          <Link href="/creator" className="flex items-center gap-2 rounded-lg font-semibold tracking-tight outline-none focus-visible:ring-3 focus-visible:ring-ring/50" aria-label="Klynt inbox">
             <LogoMark />
-            <span className="hidden text-[15px] lg:inline">Creator Connect</span>
+            <span className="hidden text-[15px] lg:inline">Klynt</span>
           </Link>
           <Suspense fallback={<div className="hidden flex-1 md:block" />}>
             <DesktopNav />

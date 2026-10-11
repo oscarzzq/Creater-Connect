@@ -55,7 +55,7 @@ export function productionSteps(item: CreatorItem): Step[] {
     key: "create",
     label: "Create your content",
     done: n > 0 && submitted === n,
-    detail: submitted === n && n ? "Done" : `Film to the brief: ${c.brief.videoLength}${c.brief.mandatoryDemo ? `, including the required demo` : ""}.`,
+    detail: submitted === n && n ? "Done" : `Record to the brief: ${c.brief.videoLength}${c.brief.mandatoryDemo ? `, including the required demo` : ""}.`,
   });
 
   if (review) {
@@ -91,7 +91,7 @@ export function productionSteps(item: CreatorItem): Step[] {
     key: "publish",
     label: "Publish organically",
     done: n > 0 && live === n,
-    detail: live === n && n ? "Live on your account" : `Post from your own account, no boosting${nextDue ? ` · by ${shortDate(nextDue)}` : ""}.`,
+    detail: live === n && n ? "Live on your account" : `Post from your own account, clearly disclosed, no boosting${nextDue ? ` · by ${shortDate(nextDue)}` : ""}.`,
   });
   steps.push({
     key: "link",

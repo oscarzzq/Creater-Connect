@@ -34,7 +34,7 @@ export function usePostDialogs(campaigns: Campaign[]) {
 
 export function confirmReceived(a: Activation, c: Campaign) {
   actions.confirmReceived(a.id);
-  toast.success(c.brief.fulfillment.kind === "ship" ? "Marked as received" : "Access confirmed", { description: "You're clear to start creating." });
+  toast.success(c.brief.fulfillment.kind === "ship" ? "Marked as received" : "Access confirmed", { description: "You're clear to start on your content." });
 }
 
 /** Activation-level banner while the product or access hasn't been confirmed. */
@@ -83,7 +83,7 @@ export function PostRow({
   const what = `${PLATFORMS[post.platform].format}${total > 1 ? ` ${post.index} of ${total}` : ""}`;
 
   let meta: string;
-  if (post.status === "not_started") meta = blocked ? `Waiting for the product · ${dueLabel(post.dueAt)}` : dueLabel(post.dueAt);
+  if (post.status === "not_started") meta = blocked ? `Waiting for access · ${dueLabel(post.dueAt)}` : dueLabel(post.dueAt);
   else if (post.status === "draft_submitted")
     meta = `Submitted ${shortDate(post.submittedAt!)} · ${brand} replies${campaign.brief.review.turnaroundDays ? ` within ${campaign.brief.review.turnaroundDays}d` : " soon"}`;
   else if (post.status === "revision_requested") meta = dueLabel(post.dueAt);

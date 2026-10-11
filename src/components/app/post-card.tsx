@@ -31,7 +31,7 @@ const LABEL: Record<Post["status"], string> = {
   verified: "Live",
 };
 
-/** 9:16 post tile. Views appear only for published posts; nothing is estimated here. */
+/** Portrait post tile (mobile view of the post). Views appear only for published posts; nothing is estimated here. */
 export function PostCard({ post, onOpen, subtitle, className, size = "md" }: { post: Post; onOpen?: () => void; subtitle?: string; className?: string; size?: "sm" | "md" }) {
   const creator = creatorById(post.creatorId);
   const started = post.status !== "not_started";

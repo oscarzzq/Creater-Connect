@@ -1,6 +1,6 @@
-# Meta Ads Connect — Hackathon MVP
+# Klynt — Hackathon MVP
 
-Native adtech: automate creator outreach. Businesses build campaigns (Ads Manager style), creators get offers/bids to accept/reject.
+B2B creator marketing. Companies in AI, developer tools, cybersecurity, enterprise SaaS and fintech reach professional and technical audiences through trusted industry creators (ML researchers, software engineers, security analysts, technical educators) who publish clearly disclosed sponsored content on their own channels. Businesses build campaigns Ads Manager style, an explainable matching engine scores creators on audience fit, relevance, view performance and cost, and creators review, accept, decline or ask a question about each offer.
 
 ## Run demo (no backend, 30s)
 
@@ -8,7 +8,7 @@ Native adtech: automate creator outreach. Businesses build campaigns (Ads Manage
 npm install
 npm run dev
 # open http://localhost:3000
-# /business = SME dashboard, /creator = creator inbox
+# /business = business dashboard, /creator = creator inbox
 ```
 
 Demo data is in-memory (`src/lib/demo-data.ts`), matching score in `src/lib/matching.ts`.
@@ -33,7 +33,7 @@ Demo data is in-memory (`src/lib/demo-data.ts`), matching score in `src/lib/matc
 
 ## Structure
 
-Model: **Campaign → Creator set → Creator activation → Post** (creator-posted organic distribution, fixed creator fees, optional delivery guarantee on verified organic views).
+Model: **Campaign → Creator set → Creator activation → Post** (creator-posted organic distribution; the business sets a fixed price per creator and Klynt adds a 1% fee; optional delivery guarantee on verified organic views).
 
 - `src/app/business/(app)/` — business app: Overview, Campaigns (Ads Manager: Campaigns | Creator sets | Posts), campaign detail (`campaigns/[id]`: Overview, Creator sets, Roster, Posts, Brief), Inbox, Settings (brand, team, payments & billing, integrations)
 - `src/app/business/campaigns/new/` — 5-step builder (Guided / Advanced): objective & basics → creator sets → brief → creator matching & approval → review & launch
@@ -47,7 +47,7 @@ Demo data uses a fixed demo date (Oct 8, 2026). **Verified** = platform-confirme
 
 ## Pitch script (60s)
 
-1. `/business`: "SME builds Glow Serum Launch like a Meta ad — budget, niche, brief."
-2. Click "Send offers to top 3": "No DMs. Our layer fires bids to best-fit creators by match score."
-3. Switch to `/creator`: "Maya gets the bid with brief + payout. Accept in one tap."
-4. Back to `/business`: "Brand sees accepted live. Campaign scales from 3 to 300 creators without negotiations."
+1. `/business`: "Kestrel AI builds Kestrel 2 Launch like an ad campaign: budget, target audience, brief."
+2. Click "Send offers to top 3": "No manual searching through thousands of profiles. Offers go to the best-fit creators by explainable match score."
+3. Switch to `/creator`: "The creator gets the offer with brief + payout and can accept, decline or ask a question."
+4. Back to `/business`: "The team sees acceptances live and tracks verified views. The campaign scales from 3 to 300 creators without negotiations."

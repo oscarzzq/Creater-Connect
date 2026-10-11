@@ -48,9 +48,9 @@ export function AdForm({ brief: b, onChange }: { brief: Brief; onChange: (patch:
             <Select value={b.format} onValueChange={(v) => set({ format: v as Brief["format"] })}>
               <SelectTrigger className="h-9 w-full"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="short_video">Short-form video</SelectItem>
-                <SelectItem value="image">Image post</SelectItem>
-                <SelectItem value="carousel">Carousel (where supported)</SelectItem>
+                <SelectItem value="video">Video</SelectItem>
+                <SelectItem value="post">Written post, thread or newsletter feature</SelectItem>
+                <SelectItem value="carousel">Carousel / document (LinkedIn)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -63,10 +63,10 @@ export function AdForm({ brief: b, onChange }: { brief: Brief; onChange: (patch:
             </div>
           </div>
           <div>
-            <FieldLabel>Video length</FieldLabel>
+            <FieldLabel>Length</FieldLabel>
             <Select value={b.videoLength} onValueChange={(v) => set({ videoLength: v })}>
               <SelectTrigger className="h-9 w-full"><SelectValue /></SelectTrigger>
-              <SelectContent>{["15–30s", "20–30s", "30–45s", "45–60s", "60–90s"].map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
+              <SelectContent>{["Under 60s", "1–3 min", "3–8 min", "8+ min", "Short post", "Long-form post", "Thread", "Sponsored section", "Dedicated issue"].map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
             </Select>
           </div>
         </div>
@@ -81,7 +81,7 @@ export function AdForm({ brief: b, onChange }: { brief: Brief; onChange: (patch:
           </div>
           <div>
             <FieldLabel htmlFor="demo" hint="Optional">Mandatory product demonstration</FieldLabel>
-            <Input id="demo" className="h-9" value={b.mandatoryDemo} onChange={(e) => set({ mandatoryDemo: e.target.value })} placeholder="e.g. Apply on camera in natural light" />
+            <Input id="demo" className="h-9" value={b.mandatoryDemo} onChange={(e) => set({ mandatoryDemo: e.target.value })} placeholder="e.g. Show a real API call in the playground" />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -111,7 +111,7 @@ export function AdForm({ brief: b, onChange }: { brief: Brief; onChange: (patch:
           </div>
           <div>
             <FieldLabel htmlFor="dest">{b.cta.type === "promo_code" ? "Code & destination" : b.cta.type === "comment_keyword" ? "Keyword" : "Destination / tracking link"}</FieldLabel>
-            <Input id="dest" className="h-9" value={b.cta.destination} onChange={(e) => set({ cta: { ...b.cta, destination: e.target.value } })} placeholder={b.cta.type === "promo_code" ? "GLOW15 · glowinc.co/…" : "https://"} />
+            <Input id="dest" className="h-9" value={b.cta.destination} onChange={(e) => set({ cta: { ...b.cta, destination: e.target.value } })} placeholder={b.cta.type === "promo_code" ? "KESTREL2 · kestrel.dev/…" : "https://"} />
           </div>
         </div>
         <div className="mt-4">
@@ -152,7 +152,7 @@ export function AdForm({ brief: b, onChange }: { brief: Brief; onChange: (patch:
                   </button>
                 ))}
               </div>
-              {b.script.mode !== "freedom" && <Textarea className="mt-2 resize-none" rows={3} value={b.script.text} onChange={(e) => set({ script: { ...b.script, text: e.target.value } })} placeholder={b.script.mode === "required_statements" ? "e.g. Say: “Use code GLOW15 for 15% off.”" : "Paste your script"} />}
+              {b.script.mode !== "freedom" && <Textarea className="mt-2 resize-none" rows={3} value={b.script.text} onChange={(e) => set({ script: { ...b.script, text: e.target.value } })} placeholder={b.script.mode === "required_statements" ? "e.g. Say: “Sponsored by Kestrel AI. Try it at kestrel.dev.”" : "Paste your script"} />}
               <Helper>We recommend creative freedom with required statements. Authentic content tends to get more organic reach.</Helper>
             </div>
           </div>
@@ -194,7 +194,7 @@ export function AdForm({ brief: b, onChange }: { brief: Brief; onChange: (patch:
                 <span className="block text-sm font-medium">Paid ad or repost rights</span>
                 <span className="block text-xs text-muted-foreground">Default is creator-posted organic only. Adding usage rights may raise fees.</span>
               </span>
-              <Switch checked={b.rights.paidUsage} onCheckedChange={(v) => set({ rights: { paidUsage: v, months: v ? 3 : 0, channels: v ? "Paid social (Meta, TikTok)" : "" } })} />
+              <Switch checked={b.rights.paidUsage} onCheckedChange={(v) => set({ rights: { paidUsage: v, months: v ? 3 : 0, channels: v ? "Paid social (LinkedIn, X)" : "" } })} />
             </label>
             {b.rights.paidUsage && (
               <div className="mt-3 grid gap-4 sm:grid-cols-2">
@@ -218,8 +218,8 @@ export function AdForm({ brief: b, onChange }: { brief: Brief; onChange: (patch:
               <Select value={b.fulfillment.kind} onValueChange={(v) => set({ fulfillment: { ...b.fulfillment, kind: v as Brief["fulfillment"]["kind"] } })}>
                 <SelectTrigger className="h-9 w-full"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ship">Ship a physical product</SelectItem>
-                  <SelectItem value="access">Software / service access</SelectItem>
+                  <SelectItem value="ship">Ship a physical product (e.g. hardware)</SelectItem>
+                  <SelectItem value="access">Software access (API credits, workspace seats)</SelectItem>
                   <SelectItem value="none">Nothing needed</SelectItem>
                 </SelectContent>
               </Select>

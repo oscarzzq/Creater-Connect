@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  AlertCircle, ArrowLeft, ArrowRight, Bot, Check, Clapperboard, Copy, Folder, Hand, LayoutGrid, MoreHorizontal, Plus, Rocket, Trash2, UserMinus, X,
+  AlertCircle, ArrowLeft, ArrowRight, Check, Clapperboard, Copy, Folder, LayoutGrid, MoreHorizontal, Plus, Rocket, Timer, Trash2, UserMinus, Users, X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -21,8 +21,9 @@ import { CreatorPhoto } from "@/components/app/creator-photo";
 import { PostCard } from "@/components/app/post-card";
 import { ActivationBadge, DataTag } from "@/components/app/status-badge";
 import { useOverlays } from "@/components/app/overlays";
+import { declineToast } from "@/components/app/decline-toast";
 import { createCampaign } from "@/app/actions/campaigns";
-import { actions, useAppState } from "@/lib/store";
+import { PAIR_WINDOW_HOURS, actions, hoursToPair, useAppState } from "@/lib/store";
 import { creatorById } from "@/lib/domain/creators";
 import { compact, shortDate, usd } from "@/lib/domain/format";
 import { OBJECTIVES } from "@/lib/domain/labels";
@@ -43,7 +44,7 @@ export function CampaignEditor({ mode, initial, initialNode }: { mode: "create" 
   const [node, setNode] = useState<Node>(initialNode ?? { type: "campaign" });
   const [publishOpen, setPublishOpen] = useState(false);
 
-  if (!draft) return <ObjectiveDialog onStart={(objective, selection) => setDraft(newCampaignDraft(objective, selection))} />;
+  if (!draft) return <ObjectiveDialog onStart={(objective) => setDraft(newCampaignDraft(objective))} />;
 
   const c = draft.campaign;
   const live = mode === "edit" && c.status !== "draft";
@@ -61,7 +62,7 @@ export function CampaignEditor({ mode, initial, initialNode }: { mode: "create" 
 
   function addSet(copyOf?: CreatorSet) {
     const id = freshId("set");
-    const base = copyOf ? { ...copyOf, id, name: `${copyOf.name} (copy)`, hypothesis: "" } : newSet(c.id, draft!.sets.length, draft!.sets[0]?.selection ?? "automatic", id);
+    const base = copyOf ? { ...copyOf, id, name: `${copyOf.name} (copy)`, hypothesis: "" } : newSet(c.id, draft!.sets.length, id);
     setDraft((d) => d && { ...d, sets: [...d.sets, base] });
     setNode({ type: "set", id });
   }
@@ -83,9 +84,9 @@ export function CampaignEditor({ mode, initial, initialNode }: { mode: "create" 
         fd.set("title", saved.campaign.name);
         fd.set("brief", `${saved.campaign.promoting.name}\n\n${saved.campaign.promoting.description}`);
         fd.set("budget_usd", String(saved.campaign.budget));
-        fd.set("niche", saved.sets[0]?.niches[0] ?? "lifestyle");
+        fd.set("niche", saved.sets[0]?.niches[0] ?? "ai");
         fd.set("min_followers", "0");
-        fd.set("max_payout_usd", String(saved.sets[0]?.maxFee ?? 1000));
+        fd.set("max_payout_usd", String(saved.sets[0]?.price ?? 1000));
         await createCampaign(fd);
       } catch {
         // not signed in: demo mode
@@ -198,7 +199,7 @@ export function CampaignEditor({ mode, initial, initialNode }: { mode: "create" 
                     depth={1}
                     icon={LayoutGrid}
                     label={s.name}
-                    sub={<span className="inline-flex items-center gap-1">{s.selection === "automatic" ? <Bot className="size-3" /> : <Hand className="size-3" />}{s.selection === "automatic" ? "Automatic" : "Manual"} · <PlatformIconRow platforms={s.platforms} className="gap-1 [&_svg]:size-3" /></span>}
+                    sub={<span className="inline-flex items-center gap-1"><PlatformIconRow platforms={s.platforms} className="gap-1 [&_svg]:size-3" />{setActs.some((a) => a.status === "recommended") && <span className="text-warning-text">· {setActs.filter((a) => a.status === "recommended").length} to review</span>}</span>}
                     active={node.type === "set" && node.id === s.id}
                     onClick={() => setNode({ type: "set", id: s.id })}
                     error={setErrors(s).length > 0}
@@ -353,7 +354,7 @@ function TreeItem({ depth, icon: Icon, label, sub, active, onClick, error, menu 
 /** One creator's ad: status, fee, their posts, per-creator instructions and roster actions. */
 function CreatorAdForm({ activationId, onExcluded }: { activationId: string; onExcluded: (creatorId: string, setId: string) => void }) {
   const world = useAppState();
-  const { openPost, openActivation } = useOverlays();
+  const { openPost, openActivation, openCreator } = useOverlays();
   const a = world.activations.find((x) => x.id === activationId)!;
   const [notes, setNotes] = useState(a.notes ?? "");
   const creator = creatorById(a.creatorId)!;
@@ -373,27 +374,28 @@ function CreatorAdForm({ activationId, onExcluded }: { activationId: string; onE
         <dl className="mt-4 grid grid-cols-3 gap-px overflow-hidden rounded-lg border bg-border text-sm">
           <div className="bg-card p-3"><dt className="text-xs text-muted-foreground">Fixed fee</dt><dd className="font-semibold tabular-nums">{usd(a.fee)}</dd></div>
           <div className="bg-card p-3"><dt className="flex items-center gap-1 text-xs text-muted-foreground">Expected <DataTag kind="estimate" /></dt><dd className="font-semibold tabular-nums">{compact(a.estViews[0])}–{compact(a.estViews[2])}</dd></div>
-          <div className="bg-card p-3"><dt className="text-xs text-muted-foreground">{a.invitedAt ? "Invited" : "Status"}</dt><dd className="font-semibold">{a.invitedAt ? shortDate(a.invitedAt) : "Not invited"}</dd></div>
+          <div className="bg-card p-3"><dt className="text-xs text-muted-foreground">{a.invitedAt ? "Invited" : a.status === "recommended" ? "Pairs automatically" : "Status"}</dt><dd className="font-semibold">{a.invitedAt ? shortDate(a.invitedAt) : a.status === "recommended" ? `in ${hoursToPair(a) ?? PAIR_WINDOW_HOURS}h` : "Not invited"}</dd></div>
         </dl>
         <div className="mt-4 flex flex-wrap gap-2">
           {a.status === "recommended" && (
-            <Button size="sm" onClick={() => { actions.approve([a.id]); toast.success(`${first} invited`); }}>
-              <Check /> Approve & invite
+            <Button size="sm" onClick={() => { actions.approve([a.id]); toast.success(`Paired with ${first}`, { description: "Their fixed-fee offer is on its way." }); }}>
+              <Check /> Pair now
             </Button>
           )}
           {["recommended", "approved", "invited", "replacement_required"].includes(a.status) && (
-            <Button size="sm" variant="outline" onClick={() => { actions.exclude(a.id); onExcluded(a.creatorId, a.setId); toast(`${first} excluded`, { description: "A comparable creator replaces them in automatic sets." }); }}>
-              <UserMinus /> Exclude creator
+            <Button size="sm" variant="outline" onClick={() => { declineToast(a.creatorId, actions.exclude(a.id)); onExcluded(a.creatorId, a.setId); }}>
+              <UserMinus /> Decline
             </Button>
           )}
+          <Button size="sm" variant="ghost" onClick={() => openCreator(a.creatorId, a.setId)}>View profile & audience</Button>
           {a.status === "accepted" && <p className="text-xs text-muted-foreground">Accepted creators can&apos;t be removed here. Message them for changes, or contact support for disputes.</p>}
         </div>
       </section>
 
       <section className="surface p-5">
         <h3 className="text-sm font-semibold">Instructions for {first} only</h3>
-        <p className="text-xs text-muted-foreground">Added on top of the set&apos;s creative brief, e.g. a specific angle or product shade.</p>
-        <Textarea className="mt-3 resize-none" rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={`e.g. ${first}, try the PM-routine angle you suggested`} />
+        <p className="text-xs text-muted-foreground">Added on top of the set&apos;s creative brief, e.g. a specific use case or feature to demo.</p>
+        <Textarea className="mt-3 resize-none" rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={`e.g. ${first}, try the agent-debugging walkthrough you suggested`} />
         <div className="mt-2 flex justify-end">
           <Button size="sm" variant="outline" disabled={notes === (a.notes ?? "")} onClick={() => { actions.setNotes(a.id, notes); toast("Saved and shared with the creator"); }}>
             Save instructions
@@ -414,17 +416,16 @@ function CreatorAdForm({ activationId, onExcluded }: { activationId: string; onE
   );
 }
 
-function ObjectiveDialog({ onStart }: { onStart: (o: Objective, selection: CreatorSet["selection"]) => void }) {
+function ObjectiveDialog({ onStart }: { onStart: (o: Objective) => void }) {
   const router = useRouter();
   const [objective, setObjective] = useState<Objective>("awareness");
-  const [selection, setSelection] = useState<CreatorSet["selection"]>("automatic");
   return (
     <div className="flex min-h-dvh items-center justify-center bg-canvas p-4">
       <Dialog open onOpenChange={(o) => !o && router.push("/business/campaigns")}>
         <DialogContent className="gap-0 p-0 sm:max-w-2xl">
           <div className="border-b p-5">
             <DialogTitle className="text-lg">Create new campaign</DialogTitle>
-            <DialogDescription>Choose a campaign objective and how creators are selected. You can change selection per creator set later.</DialogDescription>
+            <DialogDescription>Choose what you want this campaign to achieve.</DialogDescription>
           </div>
           <div className="grid gap-5 p-5 sm:grid-cols-[1fr_1fr]">
             <div>
@@ -442,22 +443,29 @@ function ObjectiveDialog({ onStart }: { onStart: (o: Objective, selection: Creat
               </p>
             </div>
             <div>
-              <div className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">Creator selection</div>
-              <div className="space-y-2">
-                <SelectableCard selected={selection === "automatic"} onSelect={() => setSelection("automatic")} className="gap-1 p-3.5">
-                  <span className="flex items-center gap-1.5 text-sm font-medium"><Bot className="size-4 text-primary" />Automatic <span className="rounded-none bg-brand-subtle px-1.5 py-0.5 text-[10px] font-semibold text-brand-subtle-foreground">Recommended</span></span>
-                  <span className="pr-5 text-xs text-muted-foreground">Set your audience, budget and max fee. We find, invite and replace creators for you.</span>
-                </SelectableCard>
-                <SelectableCard selected={selection === "manual"} onSelect={() => setSelection("manual")} className="gap-1 p-3.5">
-                  <span className="flex items-center gap-1.5 text-sm font-medium"><Hand className="size-4 text-muted-foreground" />Manual review</span>
-                  <span className="pr-5 text-xs text-muted-foreground">We recommend creators; you approve each one before offers go out.</span>
-                </SelectableCard>
-              </div>
+              <div className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">How creators are matched</div>
+              <ol className="space-y-3 rounded-xl border p-4 text-sm">
+                {(
+                  [
+                    [Users, "Intelligent matching", "We score creators on audience fit, relevance and cost from their connected LinkedIn, X, YouTube and newsletter data, within your budget."],
+                    [Timer, "You have 24 hours to decline", "Check anyone's profile and audience. Matches you don't decline pair automatically."],
+                    [Check, "Creators accept a fixed fee", "No negotiation. You pay once their posts are verified."],
+                  ] as const
+                ).map(([Icon, title, body]) => (
+                  <li key={title} className="flex gap-3">
+                    <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-subtle text-primary"><Icon className="size-3.5" /></span>
+                    <span>
+                      <span className="block font-medium">{title}</span>
+                      <span className="text-xs text-muted-foreground">{body}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
             </div>
           </div>
           <div className="flex justify-end gap-2 border-t p-4">
             <Button variant="outline" asChild><Link href="/business/campaigns">Cancel</Link></Button>
-            <Button onClick={() => onStart(objective, selection)}>Continue</Button>
+            <Button onClick={() => onStart(objective)}>Continue</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -478,16 +486,16 @@ function PublishDialog({ open, onOpenChange, draft, budgets, onPublish }: { open
       <DialogContent className="gap-0 p-0 sm:max-w-lg">
         <div className="border-b p-5">
           <DialogTitle className="text-base">Publish {c.name}?</DialogTitle>
-          <DialogDescription>Matching runs now. Fixed-fee offers only become commitments when creators accept.</DialogDescription>
+          <DialogDescription>Matching runs now. You have 24 hours to decline any match before it pairs; fees only become commitments when creators accept.</DialogDescription>
         </div>
         <ul className="divide-y">
           {f.map(({ s, count: n, fees, views }) => (
             <li key={s.id} className="flex items-center gap-3 px-5 py-3 text-sm">
-              {s.selection === "automatic" ? <Bot className="size-4 text-primary" /> : <Hand className="size-4 text-muted-foreground" />}
+              <Users className="size-4 text-muted-foreground" />
               <div className="min-w-0 flex-1">
                 <div className="truncate font-medium">{s.name}</div>
                 <div className="text-xs text-muted-foreground">
-                  {s.selection === "automatic" ? `~${n} creators invited now` : `~${n} creators recommended for your approval`} · {compact(views[0])}–{compact(views[2])} views
+                  ~{n} creators matched · {compact(views[0])}–{compact(views[2])} views
                 </div>
               </div>
               <span className="tabular-nums">{usd(fees)}</span>
@@ -495,9 +503,9 @@ function PublishDialog({ open, onOpenChange, draft, budgets, onPublish }: { open
           ))}
         </ul>
         <dl className="space-y-1.5 border-t bg-muted/30 p-5 text-sm">
-          <div className="flex justify-between"><dt className="text-muted-foreground">Estimated fees incl. 10% platform fee</dt><dd className="font-medium tabular-nums">{usd(total)}</dd></div>
+          <div className="flex justify-between"><dt className="text-muted-foreground">Creator prices + 1% Klynt fee</dt><dd className="font-medium tabular-nums">{usd(total)}</dd></div>
           <div className="flex justify-between"><dt className="text-muted-foreground">Campaign budget</dt><dd className="tabular-nums">{usd(c.budget)}</dd></div>
-          <div className="flex justify-between"><dt className="flex items-center gap-1 text-muted-foreground">Guaranteed floor <DataTag kind="guaranteed" /></dt><dd className="font-medium tabular-nums">{floor ? `${compact(floor)} views` : "Needs 3+ creators"}</dd></div>
+          <div className="flex justify-between"><dt className="flex items-center gap-1 text-muted-foreground">Guaranteed view floor <DataTag kind="guaranteed" /></dt><dd className="font-medium tabular-nums">{floor ? `${compact(floor)} views` : "Needs 3+ creators"}</dd></div>
           <p className="pt-2 text-xs text-muted-foreground">Budget is authorized now and charged per creator once their posts are verified. Organic reach follows creators&apos; real audiences and isn&apos;t precisely targeted. Dates {shortDate(c.startDate)} – {shortDate(c.endDate)}.</p>
         </dl>
         <div className="flex justify-end gap-2 border-t p-4">

@@ -12,8 +12,8 @@ import type { Activation, Campaign } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
 import { BrandMark } from "./brand-mark";
 
-const TOPICS_OFFER = ["Question about the brief", "Can I film it differently?", "Timeline question"];
-const TOPICS_ACTIVE = ["Product hasn't arrived", "Question about the brief", "I need more time", "Problem posting"];
+const TOPICS_OFFER = ["Question about the brief", "Can I adapt the format?", "Timeline question"];
+const TOPICS_ACTIVE = ["Product access issue", "Question about the brief", "I need more time", "Problem posting"];
 
 function time(iso: string) {
   const [, t] = iso.split("T");
@@ -91,7 +91,7 @@ export function MessageThread({ activation, campaign, readOnly = false, classNam
               if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) send();
             }}
             rows={2}
-            placeholder={activation.status === "accepted" ? "Describe the question or issue…" : "e.g. Can I film this as part of my night routine?"}
+            placeholder={activation.status === "accepted" ? "Describe the question or issue…" : "e.g. Can I cover this in my weekly systems design breakdown?"}
             className="resize-none"
           />
           <Button variant="outline" className="h-9 w-full" disabled={!text.trim()} onClick={send}>

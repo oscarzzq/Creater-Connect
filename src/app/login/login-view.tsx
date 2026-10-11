@@ -36,22 +36,33 @@ const URL_ERRORS: Record<string, AuthError> = {
   },
 };
 
+const NICHE_LABELS: Record<string, string> = {
+  ai: "AI & Machine Learning",
+  devtools: "Developer Tools",
+  cloud: "Cloud & Infrastructure",
+  security: "Cybersecurity",
+  data: "Data & Analytics",
+  saas: "Enterprise SaaS",
+  fintech: "Fintech",
+  product: "Product & Design",
+};
+
 const COPY = {
   business: {
-    signin: "Sign in to launch campaigns and track verified views.",
-    signup: "Launch your first creator campaign in minutes.",
+    signin: "Sign in to launch creator campaigns and track verified views.",
+    signup: "Launch your first creator-led campaign in minutes.",
     emailLabel: "Work email",
-    emailPlaceholder: "name@brand.com",
-    nameLabel: "Business name",
-    namePlaceholder: "Lumen Skin",
+    emailPlaceholder: "name@company.com",
+    nameLabel: "Company name",
+    namePlaceholder: "Kestrel AI",
   },
   creator: {
-    signin: "Sign in to review offers and get paid.",
-    signup: "Get offers from brands that fit your audience.",
+    signin: "Sign in to review sponsorship offers and get paid.",
+    signup: "Get sponsorship offers that fit your expertise and audience.",
     emailLabel: "Email",
     emailPlaceholder: "you@example.com",
     nameLabel: "Your name",
-    namePlaceholder: "Maya Chen",
+    namePlaceholder: "Sam Rivera",
   },
 } as const;
 
@@ -110,7 +121,7 @@ function Field({
 
 function RoleToggle({ role, onChange }: { role: Role; onChange: (r: Role) => void }) {
   const options: { value: Role; label: string }[] = [
-    { value: "business", label: "I'm a brand" },
+    { value: "business", label: "I'm a business" },
     { value: "creator", label: "I'm a creator" },
   ];
   const refs = useRef<Record<Role, HTMLButtonElement | null>>({ business: null, creator: null });
@@ -188,7 +199,7 @@ export function LoginView({ urlError, initialRole = "business" }: { urlError?: A
     const password = String(fd.get("password") ?? "");
     const next: FieldErrors = {};
     if (mode === "signup" && !String(fd.get("name") ?? "").trim())
-      next.name = role === "business" ? "Enter your business name." : "Enter your name.";
+      next.name = role === "business" ? "Enter your company name." : "Enter your name.";
     if (!email) next.email = "Enter your email address.";
     else if (!EMAIL_RE.test(email)) next.email = `Enter a full email address, like ${copy.emailPlaceholder}`;
     if (!password) next.password = "Enter your password to continue.";
@@ -239,7 +250,7 @@ export function LoginView({ urlError, initialRole = "business" }: { urlError?: A
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground lg:flex-row">
       <section className="flex flex-col gap-10 px-6 py-6 sm:px-12 sm:py-10 lg:min-h-screen lg:w-[560px] lg:shrink-0 lg:justify-between lg:px-16 lg:py-12 xl:w-[640px] xl:px-20">
-        <Link href="/" aria-label="Creator Connect home" className="w-fit rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+        <Link href="/" aria-label="Klynt home" className="w-fit rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
           <Logo />
         </Link>
 
@@ -277,16 +288,16 @@ export function LoginView({ urlError, initialRole = "business" }: { urlError?: A
                     <Input {...fieldProps("name")} autoComplete={role === "business" ? "organization" : "name"} placeholder={copy.namePlaceholder} />
                   </Field>
                   {role === "creator" && (
-                    <Field id="niche" label="Niche">
+                    <Field id="niche" label="Category">
                       <select
                         id="niche"
                         name="niche"
-                        defaultValue="lifestyle"
+                        defaultValue="ai"
                         className="h-10 w-full rounded-md border border-input-strong bg-background px-3 text-sm capitalize outline-none hover:border-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50"
                       >
                         {NICHE_OPTIONS.map((n) => (
                           <option key={n} value={n}>
-                            {n}
+                            {NICHE_LABELS[n] ?? n}
                           </option>
                         ))}
                       </select>
@@ -332,7 +343,7 @@ export function LoginView({ urlError, initialRole = "business" }: { urlError?: A
           </form>
 
           <p className="text-center text-sm text-muted-foreground">
-            {mode === "signin" ? "New to Creator Connect? " : "Already have an account? "}
+            {mode === "signin" ? "New to Klynt? " : "Already have an account? "}
             <button
               type="button"
               onClick={switchMode}
@@ -347,7 +358,7 @@ export function LoginView({ urlError, initialRole = "business" }: { urlError?: A
           <p>
             Just exploring? Try the demo as{" "}
             <Link href="/business" className="rounded-sm text-primary outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50">
-              a brand
+              a business
             </Link>{" "}
             or{" "}
             <Link href="/creator" className="rounded-sm text-primary outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50">

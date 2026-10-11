@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { actions, useAppState } from "@/lib/store";
+import { PAIR_WINDOW_HOURS, actions, hoursToPair, useAppState } from "@/lib/store";
 import { creatorById } from "@/lib/domain/creators";
 import { compact, relative, shortDate, usd } from "@/lib/domain/format";
 import { REMEDIES } from "@/lib/domain/labels";
@@ -206,10 +206,10 @@ function Detail({ item }: { item: InboxItem }) {
         {/* Recommendations ready */}
         {item.kind === "review_recommendations" && (
           <div className="surface p-4 text-sm">
-            <p>This creator set uses manual review. Approve the creators you want; their fixed-fee offers go out as soon as you approve.</p>
+            <p>These creators pair automatically when their 24-hour window ends. Check their profiles and audience data, and decline anyone who isn&apos;t right. We&apos;ll match a comparable replacement.</p>
             <Button asChild className="mt-3">
               <Link href={`/business/campaigns/${campaign.id}?tab=sets${item.setId ? `&set=${item.setId}` : ""}`}>
-                Review creators <ArrowRight />
+                Review matches <ArrowRight />
               </Link>
             </Button>
           </div>
@@ -335,7 +335,7 @@ function ReplacementCard({ actId }: { actId: string }) {
     <div className="surface overflow-hidden">
       {old && (
         <div className="border-b bg-muted/40 px-4 py-3 text-sm">
-          {oldCreator?.name} declined{old.declineReason ? `: “${old.declineReason}”` : "."} Their {usd(old.fee)} slot in “{set?.name}” needs a replacement.
+          {oldCreator?.name} declined{old.declineReason ? `: “${old.declineReason}”` : "."} We matched a comparable creator for their {usd(old.fee)} slot in “{set?.name}”. They pair automatically in {hoursToPair(act) ?? PAIR_WINDOW_HOURS}h unless you decline.
         </div>
       )}
       <div className="flex flex-wrap items-center gap-3 p-4">
@@ -351,11 +351,11 @@ function ReplacementCard({ actId }: { actId: string }) {
       </div>
       <div className="flex flex-wrap justify-end gap-2 border-t px-4 py-3">
         <Button size="sm" variant="ghost" onClick={() => openCreator(creator.id, act.setId)}>View profile</Button>
-        <Button size="sm" variant="outline" onClick={() => { actions.nextReplacement(act.id); toast("Suggested another comparable creator"); }}>
-          <RefreshCw /> Suggest another
+        <Button size="sm" variant="outline" onClick={() => { actions.nextReplacement(act.id); toast(`Declined ${creator.name.split(" ")[0]}`, { description: "We matched another comparable creator." }); }}>
+          <RefreshCw /> Decline
         </Button>
-        <Button size="sm" onClick={() => { actions.approve([act.id]); toast.success(`${creator.name} invited`, { description: "They have 7 days to accept." }); }}>
-          <Check /> Approve & invite
+        <Button size="sm" onClick={() => { actions.approve([act.id]); toast.success(`Paired with ${creator.name}`, { description: "They have 7 days to accept." }); }}>
+          <Check /> Pair now
         </Button>
       </div>
     </div>

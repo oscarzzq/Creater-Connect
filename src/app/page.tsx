@@ -10,32 +10,40 @@ const STEPS = [
   {
     icon: Megaphone,
     title: "Build a campaign once",
-    body: "Set a budget, target niche and brief the way you would in an ads manager. No spreadsheets, no cold DMs.",
+    body: "Set a budget, the professional audience you want to reach, a brief and the price you'll pay each creator, the way you would in an ads manager. No spreadsheets, no cold outreach.",
   },
   {
     icon: Sparkles,
-    title: "We match and send offers",
-    body: "Every creator gets an explainable match score on audience, niche and price fit. Send fixed-fee offers to the best fits in one click.",
+    title: "Get matched with relevant creators",
+    body: "Our matching engine gives every creator an explainable score on audience fit, relevance, view performance and cost. Offers go out at your price; no negotiation.",
   },
   {
     icon: BadgeCheck,
     title: "Pay on verified views",
-    body: "Creators accept in one tap, post, and get paid. You see platform-verified views, not screenshots.",
+    body: "Creators review the offer, accept, and publish clearly disclosed content on their own channels. You see platform-verified views, not screenshots.",
   },
 ];
 
 const AUDIENCES = [
   {
-    eyebrow: "For brands",
-    title: "Run creator marketing like performance marketing",
-    points: ["Campaigns, creator sets and posts in one table", "Explainable matching, not guesswork", "Optional delivery guarantee on verified views"],
-    cta: { label: "Open the brand demo", href: "/business" },
+    eyebrow: "For businesses",
+    title: "Reach your ideal customers through creators they already trust",
+    points: [
+      "For marketing, DevRel and growth teams, from startups to enterprise",
+      "Explainable match scores instead of searching thousands of profiles",
+      "Optional delivery guarantee on verified organic views",
+    ],
+    cta: { label: "Open the business demo", href: "/business" },
     icon: Megaphone,
   },
   {
     eyebrow: "For creators",
-    title: "Get paid offers that fit your audience",
-    points: ["Offers arrive with the brief and the payout up front", "Accept, decline or ask a question in one tap", "Track production and earnings in one place"],
+    title: "Sponsorships that fit your expertise",
+    points: [
+      "Offers relevant to your expertise and audience, with the brief and payout up front",
+      "Review, accept, decline or ask a question about every offer",
+      "Content stays authentic, on your own channels, and clearly disclosed",
+    ],
     cta: { label: "Open the creator demo", href: "/creator" },
     icon: Inbox,
   },
@@ -43,9 +51,9 @@ const AUDIENCES = [
 
 const PROVENANCE = [
   { kind: "verified", label: "Verified", body: "Organic views confirmed by the platform." },
-  { kind: "attributed", label: "Attributed", body: "Clicks, codes and conversions we can trace." },
+  { kind: "attributed", label: "Attributed", body: "Clicks, codes and sign-ups we can trace. Reported, never promised." },
   { kind: "estimate", label: "Estimate", body: "Projections, always labelled as such." },
-  { kind: "guaranteed", label: "Guaranteed", body: "The contractual floor you pay against." },
+  { kind: "guaranteed", label: "Guaranteed", body: "A contractual floor on verified organic views. It never covers clicks, sign-ups or revenue." },
 ] as const;
 
 const link = "rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50";
@@ -55,7 +63,7 @@ export default function Home() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-20 border-b bg-background">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Link href="/" aria-label="Creator Connect home" className={link}>
+          <Link href="/" aria-label="Klynt home" className={link}>
             <Logo />
           </Link>
           <nav aria-label="Main" className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
@@ -79,14 +87,15 @@ export default function Home() {
         <section className="mx-auto grid max-w-6xl items-center gap-12 px-4 pt-12 pb-16 sm:px-6 lg:grid-cols-[1fr_minmax(0,520px)] lg:pt-20 lg:pb-24">
           <div className="flex flex-col gap-6">
             <p className="w-fit bg-brand-subtle px-2.5 py-1 text-xs font-medium text-brand-subtle-foreground">
-              Creator campaigns, without the DMs
+              B2B creator marketing
             </p>
             <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl sm:leading-[1.1]">
-              Launch creator campaigns like ads.
+              Reach the right audience through the right creators.
             </h1>
             <p className="max-w-xl text-base text-muted-foreground sm:text-lg">
-              Brief once. Creator Connect matches creators by audience fit, sends offers in one click, and pays out only on
-              verified views.
+              Discover and partner with trusted industry creators who can introduce your product to the people who matter.
+              Our intelligent matching engine connects your campaigns with relevant creators across professional and
+              technical communities.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button asChild className="h-11 px-5 text-base">
@@ -101,7 +110,7 @@ export default function Home() {
             </div>
             <p className="text-sm text-muted-foreground">
               Just looking? Explore the{" "}
-              <Link href="/business" className={`${link} font-medium text-primary hover:underline`}>brand demo</Link> or the{" "}
+              <Link href="/business" className={`${link} font-medium text-primary hover:underline`}>business demo</Link> or the{" "}
               <Link href="/creator" className={`${link} font-medium text-primary hover:underline`}>creator demo</Link>. No account needed.
             </p>
           </div>
@@ -131,7 +140,7 @@ export default function Home() {
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
             <div className="flex max-w-2xl flex-col gap-3">
               <h2 className="text-3xl font-semibold tracking-tight">How it works</h2>
-              <p className="text-muted-foreground">From brief to verified views in three steps. The creator side is just as simple.</p>
+              <p className="text-muted-foreground">From brief to verified views in three steps, whether you sell AI models, developer tools, security, SaaS or fintech products. The creator side is just as simple.</p>
             </div>
             <ol className="mt-10 grid gap-4 md:grid-cols-3">
               {STEPS.map((s, i) => (
@@ -186,7 +195,8 @@ export default function Home() {
             <div className="flex flex-col gap-3">
               <h2 className="text-3xl font-semibold tracking-tight">Numbers you can trust</h2>
               <p className="text-muted-foreground">
-                Every metric in Creator Connect says where it came from, so you never mistake a projection for a result.
+                Every metric in Klynt says where it came from, so you never mistake a projection for a result.
+                Views can be guaranteed. Sign-ups, pipeline and revenue never are.
               </p>
             </div>
             <dl className="grid gap-3 sm:grid-cols-2">
@@ -208,10 +218,10 @@ export default function Home() {
           <div className="bg-primary px-6 py-12 text-primary-foreground sm:px-12">
             <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
               <div className="flex flex-col gap-2">
-                <h2 className="text-3xl font-semibold tracking-tight">Your next campaign, without the DMs.</h2>
+                <h2 className="text-3xl font-semibold tracking-tight">Find the creators your customers already follow.</h2>
                 <p className="flex items-center gap-2 text-sm">
                   <Wallet className="size-4" aria-hidden />
-                  Fixed creator fees. Pay on verified views.
+                  You set the price. Klynt takes 1%. Pay on verified views.
                 </p>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row">
@@ -230,7 +240,7 @@ export default function Home() {
       <footer className="border-t">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <Logo className="text-foreground" />
-          <p>© 2026 Creator Connect. Demo data is simulated.</p>
+          <p>© 2026 Klynt. Demo data is simulated.</p>
         </div>
       </footer>
     </div>

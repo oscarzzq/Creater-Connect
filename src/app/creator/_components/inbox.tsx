@@ -87,7 +87,7 @@ export function Inbox() {
             <EmptyState
               icon={InboxIcon}
               title="You're all caught up"
-              description="New offers land here the moment a brand matches with you. Keep your connected accounts and profile current to show up in more campaigns."
+              description="Sponsorship offers from businesses relevant to your expertise and audience land here as soon as you're matched to a campaign. Keep your profile and connected accounts current to be matched more often."
               action={
                 <Button asChild variant="outline">
                   <Link href="/creator/onboarding">

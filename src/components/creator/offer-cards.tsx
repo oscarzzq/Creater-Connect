@@ -139,7 +139,7 @@ export function OfferRow({ item }: { item: CreatorItem }) {
   if (item.status === "expired") detail = "Expired before you replied";
   else if (item.status === "declined") detail = a.declineReason ? `You declined: ${a.declineReason}` : "You declined";
   else if (item.paidAt) detail = `Paid ${shortDate(item.paidAt)}${views ? ` · ${compact(views)} verified views` : ""}`;
-  else if (item.phase === "receive") detail = a.fulfillment === "shipped" ? "Product on its way · confirm when it arrives" : "Brand is preparing your product";
+  else if (item.phase === "receive") detail = a.fulfillment === "shipped" ? "Product on its way · confirm when it arrives" : "Brand is setting up your access";
   else if (item.phase === "in_review") detail = `Draft in review with ${c.businessName}`;
   else if (item.phase === "verifying") detail = "Verifying your posts · up to 48h";
   else if (next) detail = dueLabel(next.dueAt);

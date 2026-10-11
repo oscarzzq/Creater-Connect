@@ -3,11 +3,11 @@ import { Photo } from "@/components/app/photo";
 import { StatusPill } from "@/components/app/status-badge";
 import { cn } from "@/lib/utils";
 
-// Product and food shots only: no people or faces in the previews.
+// Screens, code and hardware shots only: no people or faces in the previews.
 export const POSTS = [
-  { image: "c-serum-shadow", initials: "MG", handle: "@maya.glows", views: "128K", duration: "0:24" },
-  { image: "c-bowl", initials: "DC", handle: "@dre.cooks", views: "86K", duration: "0:31" },
-  { image: "c-jars", initials: "NW", handle: "@noor.well", views: "214K", duration: "0:18" },
+  { image: "t-ai", initials: "LM", handle: "@lena.ml", views: "128K", duration: "0:24" },
+  { image: "t-servers", initials: "SS", handle: "@systems.sam", views: "86K", duration: "0:31" },
+  { image: "t-security", initials: "NT", handle: "@noor.threatintel", views: "214K", duration: "0:18" },
 ];
 
 function VerifiedTag() {
@@ -26,7 +26,7 @@ export function VideoThumbnail({ post, className }: { post: (typeof POSTS)[numbe
         <div className="absolute inset-x-2 top-2 flex items-center justify-between text-[11px] font-medium text-white">
           <span className="inline-flex items-center gap-1 bg-black/70 px-1.5 py-0.5">
             <Film className="size-3" />
-            Reel
+            Video
           </span>
           <span className="bg-black/70 px-1.5 py-0.5 tabular-nums">{post.duration}</span>
         </div>
@@ -54,10 +54,10 @@ export function CampaignCard() {
   return (
     <div className="flex flex-col gap-4 border bg-card p-5 text-card-foreground">
       <div className="flex items-center gap-3">
-        <span className="grid size-9 shrink-0 place-items-center bg-warning-subtle text-sm font-medium text-warning-text">LS</span>
+        <span className="grid size-9 shrink-0 place-items-center bg-warning-subtle text-sm font-medium text-warning-text">K</span>
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="truncate text-base font-semibold">Glow Serum Launch</span>
-          <span className="text-xs text-muted-foreground">Lumen Skin · 12 creators</span>
+          <span className="truncate text-base font-semibold">Kestrel 2 Launch</span>
+          <span className="text-xs text-muted-foreground">Kestrel AI · 12 creators</span>
         </span>
         <StatusPill tone="success">Live</StatusPill>
       </div>
@@ -98,7 +98,7 @@ export function PayoutNotification() {
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="text-sm font-medium tabular-nums">Payout sent · $450.00</span>
-        <span className="truncate text-xs text-muted-foreground">@maya.glows · Glow Serum Launch</span>
+        <span className="truncate text-xs text-muted-foreground">@lena.ml · Kestrel 2 Launch</span>
       </span>
       <span className="text-xs text-muted-foreground">now</span>
     </div>
@@ -112,10 +112,10 @@ export function AuthShowcase() {
       <div className="mx-auto flex w-full max-w-[672px] flex-col gap-8 lg:gap-10">
         <div className="flex flex-col gap-3">
           <h2 className="text-3xl font-semibold tracking-tight lg:text-[2.5rem] lg:leading-[3rem] lg:tracking-[-0.025em]">
-            Launch creator campaigns like ads.
+            Reach the right audience through the right creators.
           </h2>
           <p className="text-sm">
-            Brief once. We match creators by audience fit, send offers in one click, and pay out only on verified views.
+            Brief once. Our matching engine finds trusted industry creators your customers already follow, sends fixed-fee offers in one click, and pays out only on verified views.
           </p>
         </div>
 

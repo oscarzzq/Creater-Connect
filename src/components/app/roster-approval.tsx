@@ -11,8 +11,8 @@ import { RecommendationCard } from "./recommendation-card";
 import { DataTag } from "./status-badge";
 
 /**
- * Review a creator set's recommended roster. Approving doesn't commit anything
- * on a draft; offers go out at launch (or immediately on a live campaign).
+ * Review a creator set's new matches. Each pairs automatically when its 24-hour
+ * window ends; the brand can decline (a replacement is matched) or pair early.
  */
 export function RosterApproval({
   set,
@@ -28,7 +28,7 @@ export function RosterApproval({
   set: CreatorSet;
   campaign: Pick<Campaign, "brief" | "status">;
   items: Activation[];
-  budget: number; // budget available to this set (incl. platform fee)
+  budget: number; // budget available to this set (incl. Klynt fee)
   onApprove: (ids: string[]) => void;
   onRemove: (id: string) => void;
   onUndo: (id: string) => void;
@@ -49,10 +49,10 @@ export function RosterApproval({
       <div className="surface grid grid-cols-2 gap-px overflow-hidden bg-border @3xl/main:grid-cols-5">
         {(
           [
-            [approved.length ? "Approved creators" : "Proposed creators", `${counted.length}`, approved.length ? `${pending.length} still to review` : "None approved yet"],
-            ["Creator fees", usd(fees), "incl. 10% platform fee"],
+            [approved.length ? "Approved creators" : "New matches", `${counted.length}`, approved.length ? `${pending.length} still to review` : "Pair automatically in 24h"],
+            ["Creator fees", usd(fees), "incl. 1% Klynt fee"],
             ["Expected views", `${compact(views[0])}–${compact(views[1])}`, "estimate"],
-            ["Guaranteed floor", floor ? compact(floor) : "—", "if launched as approved"],
+            ["Guaranteed floor", floor ? compact(floor) : "—", "if all of them pair"],
             ["Budget remaining", usd(remaining), remaining < 0 ? "over this set's budget" : `of ${usd(budget)}`],
           ] as const
         ).map(([label, value, sub]) => (
@@ -70,22 +70,22 @@ export function RosterApproval({
 
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-muted-foreground">
-          Approving a creator doesn&apos;t mean they&apos;ve accepted. {campaign.status === "draft" ? "Offers go out when you launch." : "Approved creators are invited immediately."}
+          {campaign.status === "draft" ? "Offers go out when you launch." : "Not sure about someone? Open their profile to check their audience, then decline. We'll match a comparable creator."}
         </p>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={onAlternatives}>
             <RefreshCw />
-            Request alternatives
+            More matches
           </Button>
           <Button size="sm" disabled={!pending.length} onClick={() => onApprove(pending.map((a) => a.id))}>
             <CheckCheck />
-            Approve all ({pending.length})
+            Pair all now ({pending.length})
           </Button>
         </div>
       </div>
 
       {pool.length === 0 ? (
-        <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">No creators to review. Request alternatives to see more matches.</p>
+        <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">No new matches to review. Ask for more matches to add creators.</p>
       ) : (
         <div className="grid gap-4 @2xl/main:grid-cols-2 @5xl/main:grid-cols-3">
           {pool.map((a) => {
