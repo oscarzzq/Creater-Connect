@@ -90,7 +90,7 @@ export function AdsManager() {
   const [selCampaigns, setSelCampaigns] = useState<string[]>([]);
   const [selSets, setSelSets] = useState<string[]>([]);
   const [selPosts, setSelPosts] = useState<string[]>([]);
-  const [showChart, setShowChart] = useState(true);
+  const [showChart, setShowChart] = useState(false);
   const [sort, setSort] = useState<{ id: string; dir: 1 | -1 } | null>(null);
   const hidden = useSyncExternalStore(subscribeColumns, readColumns, () => DEFAULT_COLUMNS);
   const toggleColumn = (id: string) => {
