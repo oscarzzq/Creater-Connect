@@ -25,56 +25,61 @@ export function parseNode(key: string | null): Node | null {
 }
 
 export const INTEREST_SUGGESTIONS: Partial<Record<NicheId, string[]>> = {
-  beauty: ["skincare routines", "makeup", "GRWM", "sensitive skin", "lip care", "K-beauty", "budget skincare"],
-  fitness: ["gym routines", "protein snacks", "home workouts", "running", "strength training"],
-  food: ["healthy snacks", "meal prep", "15-minute recipes", "coffee"],
-  education: ["university students", "college skincare", "study routines"],
-  fashion: ["GRWM", "capsule wardrobe", "try-on hauls"],
-  lifestyle: ["morning routines", "self-care", "travel", "home rituals"],
-  tech: ["gadgets", "desk setups", "productivity"],
+  ai: ["LLM evals", "AI agents", "model benchmarks", "paper breakdowns", "RAG", "voice AI", "AI safety"],
+  devtools: ["AI coding tools", "developer productivity", "code review", "API tutorials", "coding tutorials"],
+  cloud: ["Kubernetes", "platform engineering", "DevOps", "observability", "cost optimization"],
+  security: ["zero trust", "threat intel", "appsec", "security tooling"],
+  data: ["data engineering", "SQL", "dashboards", "analytics engineering"],
+  saas: ["enterprise software", "AI adoption", "B2B go-to-market"],
+  fintech: ["payments APIs", "spend management", "startup finance"],
+  product: ["AI product management", "product launches", "UX design", "design systems"],
+  webdev: ["web development", "frontend", "web performance"],
+  leadership: ["engineering management", "AI adoption", "developer productivity"],
+  startups: ["founder diaries", "startup finance", "AI tools for teams"],
+  careers: ["learning to code", "interview prep", "CS students", "tech careers"],
 };
 
 let n = 0;
 /** Only call from event handlers (never during render). */
 export const freshId = (p: string) => `${p}-${Date.now().toString(36)}-${(n++).toString(36)}`;
 
-export function newSet(campaignId: string, index: number, selection: CreatorSet["selection"], id: string): CreatorSet {
+export function newSet(campaignId: string, index: number, id: string): CreatorSet {
   return {
     id,
     campaignId,
     name: index === 0 ? "New creator set" : `Creator set ${String.fromCharCode(65 + index)}`,
     hypothesis: "",
-    platforms: ["tiktok", "instagram"],
+    platforms: ["youtube", "x"],
     audienceGeo: ["US"],
     creatorGeo: { countries: [], required: false },
-    demographics: { ageMin: 18, ageMax: 34, gender: "women", languages: ["English"] },
-    niches: ["beauty"],
-    interests: ["lip care", "makeup", "GRWM"],
+    demographics: { ageMin: 25, ageMax: 44, gender: "all", languages: ["English"] },
+    niches: ["ai", "devtools"],
+    interests: ["AI agents", "AI coding tools", "voice AI"],
     qualification: { minMedianViews: 15_000 },
-    selection,
+    price: 500,
     includeCreators: [],
     excludeCreators: [],
   };
 }
 
 /** Stable ids during render; real ids are assigned on save (see withFreshIds). */
-export function newCampaignDraft(objective: Objective, selection: CreatorSet["selection"]): EditorDraft {
+export function newCampaignDraft(objective: Objective): EditorDraft {
   const id = "draft-campaign";
   const campaign: Campaign = {
     id,
     businessId: BUSINESS.id,
     businessName: BUSINESS.name,
-    businessLogo: "G",
-    businessColor: "bg-[oklch(0.55_0.15_45)]",
+    businessLogo: "K",
+    businessColor: "bg-[oklch(0.45_0.12_260)]",
     source: "local",
-    name: "Glow Lip Oil Launch",
+    name: "Kestrel Voice Launch",
     objective,
     promoting: {
       kind: "product",
-      name: "Glow Tinted Lip Oil",
-      description: "Non-sticky tinted lip oil with jojoba and vitamin E. Four shades.",
-      url: "https://glowinc.co/lip-oil",
-      image: "c-brushes",
+      name: "Kestrel Voice API",
+      description: "Real-time speech-to-speech API with sub-300ms responses. Now in developer preview.",
+      url: "https://kestrel.dev/voice",
+      image: "t-mic",
     },
     status: "draft",
     budget: 3000,
@@ -82,19 +87,19 @@ export function newCampaignDraft(objective: Objective, selection: CreatorSet["se
     endDate: "2026-11-30T23:59:00",
     allocation: "automatic",
     brief: defaultBrief({
-      benefits: ["Glossy tint without the stickiness", "Hydrates for hours"],
-      intendedAudience: "Women 18–34 who want an easy everyday lip",
-      talkingPoints: ["Swatch the shade on your lips", "Say how it feels after an hour"],
-      mandatoryDemo: "Apply on camera in natural light",
-      requiredMentions: ["@glowinc", "#GlowUp"],
-      cta: { type: "promo_code", destination: "LIPGLOW · glowinc.co/lip-oil", measurement: "Promo code redemptions + UTM link in bio" },
-      hooks: ["The lip oil that isn't sticky", "Testing a lip oil for 8 hours"],
+      benefits: ["Sub-300ms voice responses", "One WebSocket for speech in and out"],
+      intendedAudience: "Developers building voice agents and assistants",
+      talkingPoints: ["Build a tiny voice demo live", "Say how the latency feels in a real conversation"],
+      mandatoryDemo: "Talk to your demo on camera, unedited",
+      requiredMentions: ["@kestrelai", "#ad"],
+      cta: { type: "signup", destination: "kestrel.dev/voice?ref=creators", measurement: "Developer preview signups via tracked link" },
+      hooks: ["I built a voice agent in 30 minutes", "Testing a voice API for latency"],
     }),
-    guarantee: { minViews: 0, platforms: ["tiktok", "instagram"], windowDays: 30, verification: "Platform API, organic views only", remedy: "supplementary_creators" },
+    guarantee: { minViews: 0, platforms: ["youtube", "x"], windowDays: 30, verification: "Platform API, organic views only", remedy: "supplementary_creators" },
     createdAt: "2026-10-08T09:30:00",
   };
-  const set = newSet(id, 0, selection, "draft-set-0");
-  return { campaign, sets: [{ ...set, name: "Lip care fans on TikTok & Reels" }] };
+  const set = newSet(id, 0, "draft-set-0");
+  return { campaign, sets: [{ ...set, name: "AI developers on YouTube & X" }] };
 }
 
 export function withFreshIds(d: EditorDraft): EditorDraft {

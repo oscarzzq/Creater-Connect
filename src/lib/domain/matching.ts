@@ -4,11 +4,15 @@ import { NICHE_LABEL } from "./labels";
 import type { Campaign, Creator, CreatorSet, Platform, PlatformStats } from "./types";
 
 // ---------------------------------------------------------------------------
-// Pricing: fixed creator fees derived from predicted organic views.
+// Pricing: the business sets a fixed price per creator; Klynt adds 1% on top.
+// Each creator's typical rate is estimated from their reach and used only for matching:
+// creators whose rate is well above the set's price are unlikely to accept, so they're skipped.
 
-export const PLATFORM_FEE_RATE = 0.1;
-/** Creator payout per 1,000 expected organic views, by platform. */
-const BASE_CPM: Record<Platform, number> = { tiktok: 11, instagram: 14, youtube: 12 };
+export const PLATFORM_FEE_RATE = 0.01;
+/** A creator would accept an offer up to this far below their typical rate. */
+const RATE_TOLERANCE = 1.3;
+/** Typical creator rate per 1,000 expected organic views (impressions on LinkedIn, opens for newsletters), by platform. */
+const BASE_CPM: Record<Platform, number> = { linkedin: 30, x: 16, youtube: 22, newsletter: 40 };
 /** Sponsored posts typically land a little under a creator's organic median. */
 const SPONSORED_FACTOR = 0.85;
 
@@ -17,7 +21,8 @@ export const withPlatformFee = (fees: number) => Math.round(fees * (1 + PLATFORM
 export interface Quote {
   platform: Platform;
   stats: PlatformStats;
-  fee: number; // creator payout for the full package
+  fee: number; // creator payout for the full package: the set's price, or the typical rate when no price is given
+  typicalFee: number; // estimated market rate for this creator and package
   estViews: [number, number, number]; // low, expected, high
   ecpm: number; // all-in cost per 1,000 expected views (incl. platform fee)
 }
@@ -27,15 +32,16 @@ function priceIndex(s: PlatformStats) {
   return 1 + Math.max(-0.2, Math.min(0.4, (s.followers / s.medianViews - 4) / 10));
 }
 
-export function quote(creator: Creator, platforms: Platform[], deliverables: number): Quote | null {
+export function quote(creator: Creator, platforms: Platform[], deliverables: number, price?: number): Quote | null {
   const options = creator.platforms.filter((p) => platforms.includes(p.platform));
   if (!options.length) return null;
   const stats = [...options].sort((a, b) => b.medianViews - a.medianViews)[0];
   const expected = Math.round(stats.medianViews * SPONSORED_FACTOR * deliverables);
   const low = Math.round(stats.p25 * SPONSORED_FACTOR * deliverables);
   const high = Math.round(stats.p75 * SPONSORED_FACTOR * deliverables);
-  const fee = Math.max(100, Math.round(((expected / 1000) * BASE_CPM[stats.platform] * priceIndex(stats)) / 5) * 5);
-  return { platform: stats.platform, stats, fee, estViews: [low, expected, high], ecpm: (withPlatformFee(fee) / expected) * 1000 };
+  const typicalFee = Math.max(100, Math.round(((expected / 1000) * BASE_CPM[stats.platform] * priceIndex(stats)) / 5) * 5);
+  const fee = price ?? typicalFee;
+  return { platform: stats.platform, stats, fee, typicalFee, estViews: [low, expected, high], ecpm: (withPlatformFee(fee) / expected) * 1000 };
 }
 
 /** The brief creators in a set actually receive: the set's own ad, or the campaign default. */
@@ -71,7 +77,8 @@ const WEIGHTS: Record<FactorKey, number> = { audience: 0.3, relevance: 0.25, per
 const AGE_BUCKETS: [keyof Creator["audience"]["ages"], number, number][] = [
   ["13–17", 13, 17], ["18–24", 18, 24], ["25–34", 25, 34], ["35–44", 35, 44], ["45+", 45, 99],
 ];
-const BENCHMARK_ECPM = 14;
+/** A typical all-in effective CPM per platform; cost efficiency is scored relative to it. */
+const benchmarkEcpm = (p: Platform) => BASE_CPM[p] * 1.15;
 const clamp = (n: number) => Math.max(0, Math.min(100, Math.round(n)));
 
 function interestOverlap(creator: Creator, set: CreatorSet) {
@@ -89,14 +96,14 @@ export function audienceShares(creator: Creator, set: CreatorSet) {
 }
 
 export function matchCreator(creator: Creator, set: CreatorSet, campaign: Pick<Campaign, "brief">): MatchResult {
-  const q = quote(creator, set.platforms, briefFor(campaign, set).deliverables);
+  const q = quote(creator, set.platforms, briefFor(campaign, set).deliverables, set.price);
   const exclusions: string[] = [];
   const { ageShare, geoShare } = audienceShares(creator, set);
   const nicheHit = creator.niches.filter((n) => set.niches.includes(n));
 
   // ---- Strict qualifications: failing any removes the creator.
   if (set.excludeCreators?.includes(creator.id)) exclusions.push("Excluded by you");
-  if (q && set.maxFee && q.fee > set.maxFee) exclusions.push(`Fixed fee ${usd(q.fee)} is above your ${usd(set.maxFee)} max per creator`);
+  if (q && q.typicalFee > set.price * RATE_TOLERANCE) exclusions.push(`Usually charges ~${usd(q.typicalFee)}, above your ${usd(set.price)} price`);
   if (!q) exclusions.push(`Not on ${set.platforms.map(platformName).join(" or ")}`);
   if (set.niches.length && !nicheHit.length) exclusions.push(`Creates ${NICHE_LABEL[creator.niches[0]]} content`);
   if (set.creatorGeo.required && set.creatorGeo.countries.length && !set.creatorGeo.countries.includes(creator.country))
@@ -131,13 +138,13 @@ export function matchCreator(creator: Creator, set: CreatorSet, campaign: Pick<C
   const viewLevel = q ? Math.min(100, (q.stats.medianViews / 50_000) * 100) : 0;
   const performanceScore = clamp(viewLevel * 0.6 + clamp((1.4 - spread) * 100) * 0.4);
 
-  const efficiencyScore = q ? clamp(100 - (q.ecpm - BENCHMARK_ECPM * 0.8) * 9) : 0;
+  const efficiencyScore = q ? clamp(100 - (q.ecpm / benchmarkEcpm(q.platform) - 0.8) * 126) : 0;
   const qualityScore = clamp((creator.audience.quality - 70) * 3.4);
 
   const genderText = g === "men" ? `${100 - creator.audience.femalePct}% men` : `${creator.audience.femalePct}% women`;
   const factors: MatchFactor[] = [
     { key: "audience", label: "Audience fit", score: audienceScore, weight: WEIGHTS.audience,
-      detail: `${genderText} · ${ageShare}% aged ${set.demographics.ageMin}–${set.demographics.ageMax} · ${geoShare}% in ${set.audienceGeo.join("/") || "target regions"}${creator.audience.verified ? " (verified)" : ""}` },
+      detail: `${g === "all" ? "" : `${genderText} · `}${ageShare}% aged ${set.demographics.ageMin}–${set.demographics.ageMax} · ${geoShare}% in ${set.audienceGeo.join("/") || "target regions"}${creator.audience.verified ? " (verified)" : ""}` },
     { key: "relevance", label: "Content relevance", score: relevanceScore, weight: WEIGHTS.relevance,
       detail: `${nicheHit.map((n) => NICHE_LABEL[n]).join(", ") || "No niche overlap"}${interests.length ? ` · covers ${interests.slice(0, 3).join(", ")}` : ""}` },
     { key: "performance", label: "Organic view performance", score: performanceScore, weight: WEIGHTS.performance,
@@ -153,7 +160,7 @@ export function matchCreator(creator: Creator, set: CreatorSet, campaign: Pick<C
   const first = creator.name.split(" ")[0];
   const reasons = ranked.slice(0, 2).map((f) => {
     switch (f.key) {
-      case "audience": return `${creator.audience.femalePct}% women and ${ageShare}% aged ${set.demographics.ageMin}–${set.demographics.ageMax}, with ${geoShare}% of viewers in ${set.audienceGeo.join("/") || "your regions"}.`;
+      case "audience": return `${g === "all" ? `${ageShare}% of their audience is aged` : `${genderText} and ${ageShare}% aged`} ${set.demographics.ageMin}–${set.demographics.ageMax}, with ${geoShare}% of viewers in ${set.audienceGeo.join("/") || "your regions"}.`;
       case "relevance": return interests.length ? `Already makes content about ${interests.slice(0, 2).join(" and ")}.` : `${first} is a ${NICHE_LABEL[nicheHit[0]] ?? "relevant"} creator.`;
       case "performance": return `Reliable reach: ${compact(q!.stats.medianViews)} median views, rarely below ${compact(q!.stats.p25)}.`;
       case "efficiency": return `Strong value at ${usd(q!.ecpm, true)} per 1,000 expected views.`;
@@ -231,7 +238,7 @@ export function exclusionSummary(excluded: MatchResult[]) {
       : reason.startsWith("Doesn't post") ? "Language"
       : reason.startsWith("Audience is only") ? "Audience gender mismatch"
       : reason.startsWith("Excluded") ? "Excluded by you"
-      : reason.startsWith("Fixed fee") ? "Above max fee"
+      : reason.startsWith("Usually charges") ? "Rate above your price"
       : "Audience quality";
     buckets[key] = (buckets[key] ?? 0) + 1;
   }
@@ -245,5 +252,5 @@ export function guaranteeFloor(lowEstimates: number[]) {
 }
 
 export function platformName(p: Platform) {
-  return { tiktok: "TikTok", instagram: "Instagram Reels", youtube: "YouTube Shorts" }[p];
+  return { linkedin: "LinkedIn", x: "X", youtube: "YouTube", newsletter: "newsletters" }[p];
 }

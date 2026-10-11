@@ -10,7 +10,7 @@ import type { Activation, Brief, Campaign, CreatorSet, Platform, Post, PostStatu
 
 // Creator-side derivations. Everything comes from the shared store so the
 // numbers a creator sees reconcile with the business side. Creators only ever
-// see their own fixed fee (activation.fee), never the platform fee or budget.
+// see their own fixed fee (activation.fee), never the Klynt fee or budget.
 
 export type InboxTab = "new" | "active" | "completed" | "declined";
 
@@ -67,7 +67,7 @@ export function phaseOf(a: Activation, c: Campaign, posts: Post[]): Phase {
 export const PHASE: Record<Phase, { label: string; tone: Tone }> = {
   offer: { label: "New offer", tone: "brand" },
   closed: { label: "Declined", tone: "neutral" },
-  receive: { label: "Waiting for product", tone: "neutral" },
+  receive: { label: "Waiting for access", tone: "neutral" },
   create: { label: "In production", tone: "brand" },
   revise: { label: "Changes requested", tone: "danger" },
   in_review: { label: "In review", tone: "warning" },
@@ -146,20 +146,18 @@ function nextDue(i: CreatorItem) {
 // ---------------------------------------------------------------------------
 // Brief → creator-facing copy
 
-const FORMAT_NOUN: Record<Brief["format"], [string, string]> = {
-  short_video: ["video", "videos"],
-  image: ["image post", "image posts"],
-  carousel: ["carousel", "carousels"],
+/** Native unit for one sponsored post, by platform and brief format. */
+const POST_UNIT: Record<Platform, Record<Brief["format"], [string, string]>> = {
+  linkedin: { video: ["LinkedIn video", "LinkedIn videos"], post: ["LinkedIn post", "LinkedIn posts"], carousel: ["LinkedIn carousel", "LinkedIn carousels"] },
+  x: { video: ["video post on X", "video posts on X"], post: ["post on X", "posts on X"], carousel: ["post on X", "posts on X"] },
+  youtube: { video: ["YouTube video", "YouTube videos"], post: ["YouTube video", "YouTube videos"], carousel: ["YouTube video", "YouTube videos"] },
+  newsletter: { video: ["newsletter feature", "newsletter features"], post: ["newsletter feature", "newsletter features"], carousel: ["newsletter feature", "newsletter features"] },
 };
 
-/** "2 Reels", "1 TikTok video", "1 YouTube Short". */
+/** "1 LinkedIn post", "2 YouTube videos", "1 newsletter feature". */
 export function deliverablesLabel(brief: Brief, platform: Platform) {
   const n = brief.deliverables;
-  if (brief.format === "short_video") {
-    const f = PLATFORMS[platform].format;
-    return `${n} ${f}${n === 1 ? "" : "s"}`;
-  }
-  return `${n} ${PLATFORMS[platform].short} ${FORMAT_NOUN[brief.format][n === 1 ? 0 : 1]}`;
+  return `${n} ${POST_UNIT[platform][brief.format][n === 1 ? 0 : 1]}`;
 }
 
 export function ctaLabel(brief: Brief) {
@@ -183,8 +181,8 @@ export function rightsText(brief: Brief, brand: string) {
 export function fulfillmentText(brief: Brief) {
   const f = brief.fulfillment;
   if (f.kind === "ship") return { title: "Product shipped to you", body: f.details || "Shipped after you accept." };
-  if (f.kind === "access") return { title: "Access provided", body: f.details || "Access details are sent after you accept." };
-  return { title: "Nothing to ship", body: f.details || "No product or access needed for this one." };
+  if (f.kind === "access") return { title: "Product access provided", body: f.details || "API credits or workspace access granted on acceptance." };
+  return { title: "No product access needed", body: f.details || "Nothing to set up. Cover the product from your own experience." };
 }
 
 export function reviewText(brief: Brief, brand: string) {
@@ -245,7 +243,8 @@ export function whyYou(summary: string) {
     .filter((s) => s && !/per 1,000 expected views/.test(s))
     .map((s) =>
       s
-        .replace(/^(\d+% women and \d+% aged)/, "Your audience is $1")
+        .replace(/^(\d+% (?:women|men) and \d+% aged)/, "Your audience is $1")
+        .replace(/^(\d+)% of their audience is aged/, "$1% of your audience is aged")
         .replace(/^Already makes content about/, "You already make content about")
         .replace(/^[A-Z][\w'-]* is an? (.+) creator\.$/, "You're a $1 creator.")
         .replace(/^Reliable reach: /, "Your reach is reliable: ")
@@ -260,9 +259,11 @@ export function whyYou(summary: string) {
 // Post links
 
 const URL_RULES: Record<Platform, { re: RegExp; example: string }> = {
-  tiktok: { re: /^https?:\/\/((www|vm|m)\.)?tiktok\.com\/\S+/i, example: "https://www.tiktok.com/@you/video/123…" },
-  instagram: { re: /^https?:\/\/(www\.)?instagram\.com\/(reel|reels|p)\/[\w-]+/i, example: "https://www.instagram.com/reel/Abc123…" },
-  youtube: { re: /^https?:\/\/((www|m)\.)?(youtube\.com\/(shorts\/|watch\?v=)|youtu\.be\/)[\w-]+/i, example: "https://youtube.com/shorts/Abc123…" },
+  linkedin: { re: /^https?:\/\/((www|[a-z]{2})\.)?linkedin\.com\/(posts|feed\/update|pulse)\/\S+/i, example: "https://www.linkedin.com/posts/you-activity-123…" },
+  x: { re: /^https?:\/\/((www|mobile)\.)?(x|twitter)\.com\/\w+\/status\/\d+/i, example: "https://x.com/you/status/123…" },
+  youtube: { re: /^https?:\/\/((www|m)\.)?(youtube\.com\/(shorts\/|watch\?v=|live\/)|youtu\.be\/)[\w-]+/i, example: "https://youtube.com/watch?v=Abc123…" },
+  // Newsletters live on many hosts (Substack, Beehiiv, Ghost, custom domains): accept any web link to the issue.
+  newsletter: { re: /^https?:\/\/[\w.-]+\.[a-z]{2,}\/\S+/i, example: "https://you.substack.com/p/issue-42…" },
 };
 
 export function urlExample(platform: Platform) {
@@ -278,8 +279,8 @@ export function normalizeUrl(raw: string) {
 export function validatePostUrl(raw: string, platform: Platform): string | null {
   const url = normalizeUrl(raw);
   if (!url) return "Paste the link to your published post.";
-  if (URL_RULES[platform].re.test(url)) return null;
-  const other = (Object.keys(URL_RULES) as Platform[]).find((p) => p !== platform && URL_RULES[p].re.test(url));
+  const other = (Object.keys(URL_RULES) as Platform[]).find((p) => p !== platform && p !== "newsletter" && URL_RULES[p].re.test(url));
+  if (URL_RULES[platform].re.test(url) && !other) return null;
   if (other) return `That link is from ${PLATFORMS[other].label}, but this deliverable is on ${PLATFORMS[platform].label}.`;
-  return `That doesn't look like a post link from ${PLATFORMS[platform].label}.`;
+  return platform === "newsletter" ? "That doesn't look like a link to a published newsletter issue." : `That doesn't look like a post link from ${PLATFORMS[platform].label}.`;
 }

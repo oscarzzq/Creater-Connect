@@ -74,7 +74,7 @@ export function StackedBar({
   className?: string;
 }) {
   return (
-    <div className={cn("flex h-2 w-full gap-0.5 overflow-hidden rounded-full bg-muted", className)}>
+    <div className={cn("flex h-2 w-full gap-0.5 overflow-hidden rounded-none bg-muted", className)}>
       {segments
         .filter((s) => s.value > 0)
         .map((s, i) => (
@@ -91,8 +91,8 @@ export function ProgressRow({ label, value, max, right, tone = "bg-primary" }: {
         <span className="text-muted-foreground">{label}</span>
         <span className="font-medium tabular-nums">{right ?? `${value}/${max}`}</span>
       </div>
-      <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-muted">
-        <div className={cn("h-full rounded-full transition-[width] duration-500", tone)} style={{ width: `${max ? Math.min(100, (value / max) * 100) : 0}%` }} />
+      <div className="mt-1.5 h-1.5 overflow-hidden rounded-none bg-muted">
+        <div className={cn("h-full rounded-none transition-[width] duration-500", tone)} style={{ width: `${max ? Math.min(100, (value / max) * 100) : 0}%` }} />
       </div>
     </div>
   );

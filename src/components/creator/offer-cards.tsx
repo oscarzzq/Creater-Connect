@@ -139,7 +139,7 @@ export function OfferRow({ item }: { item: CreatorItem }) {
   if (item.status === "expired") detail = "Expired before you replied";
   else if (item.status === "declined") detail = a.declineReason ? `You declined: ${a.declineReason}` : "You declined";
   else if (item.paidAt) detail = `Paid ${shortDate(item.paidAt)}${views ? ` · ${compact(views)} verified views` : ""}`;
-  else if (item.phase === "receive") detail = a.fulfillment === "shipped" ? "Product on its way · confirm when it arrives" : "Brand is preparing your product";
+  else if (item.phase === "receive") detail = a.fulfillment === "shipped" ? "Product on its way · confirm when it arrives" : "Brand is setting up your access";
   else if (item.phase === "in_review") detail = `Draft in review with ${c.businessName}`;
   else if (item.phase === "verifying") detail = "Verifying your posts · up to 48h";
   else if (next) detail = dueLabel(next.dueAt);
@@ -163,8 +163,8 @@ export function OfferRow({ item }: { item: CreatorItem }) {
         </div>
         {!closed && !item.paidAt && posts.length > 0 && (
           <div className="mt-2 flex items-center gap-2" aria-label={`${live} of ${posts.length} posts published`}>
-            <div className="h-1 flex-1 overflow-hidden rounded-full bg-muted">
-              <div className="h-full rounded-full bg-success" style={{ width: `${(live / posts.length) * 100}%` }} />
+            <div className="h-1 flex-1 overflow-hidden rounded-none bg-muted">
+              <div className="h-full rounded-none bg-success" style={{ width: `${(live / posts.length) * 100}%` }} />
             </div>
             <span className="text-[11px] text-muted-foreground tabular-nums">
               {live}/{posts.length}

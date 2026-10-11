@@ -69,13 +69,13 @@ function OnboardingFlow({ creator }: { creator: Creator }) {
           Earnings &amp; profile
         </Link>
         <h1 className="mt-3 text-2xl font-semibold tracking-tight">Set up your creator profile</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Takes about two minutes. Brands only ever see your stats, never your logins.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Takes about two minutes. Get matched with sponsorships relevant to your expertise. Brands only ever see your stats, never your logins.</p>
       </header>
 
       <ol className="flex items-center gap-1.5" aria-label="Setup progress">
         {STEPS.map((s, i) => (
           <li key={s.key} className="flex min-w-0 flex-1 flex-col gap-1.5" aria-current={i === step ? "step" : undefined}>
-            <span className={cn("h-1 rounded-full", i < step ? "bg-success" : i === step ? "bg-primary" : "bg-muted")} />
+            <span className={cn("h-1 rounded-none", i < step ? "bg-success" : i === step ? "bg-primary" : "bg-muted")} />
             <span className={cn("truncate text-[11px] font-medium", i === step ? "text-foreground" : "text-muted-foreground")}>
               {s.label}
               <span className="sr-only">{i < step ? " (done)" : i === step ? " (current)" : ""}</span>
@@ -87,7 +87,7 @@ function OnboardingFlow({ creator }: { creator: Creator }) {
       <section className="surface p-4 sm:p-6">
         {step === 0 && (
           <div className="space-y-4">
-            <StepTitle title="Connect your social accounts" body="We read your last 20 organic videos to price offers fairly, and your audience demographics to match you with brands." />
+            <StepTitle title="Connect your social accounts" body="We read your last 20 organic videos to price offers fairly, and your audience demographics to match you with relevant businesses." />
             <ul className="space-y-2">
               {PLATFORM_ORDER.map((p) => {
                 const on = connected.includes(p);
@@ -125,9 +125,9 @@ function OnboardingFlow({ creator }: { creator: Creator }) {
 
         {step === 1 && (
           <div className="space-y-5">
-            <StepTitle title="Your profile" body="Used to match you with campaigns. You can change it anytime." />
-            <Field label="What do you make content about?" hint="Pick all that apply. Your first pick is your primary niche.">
-              <div role="group" aria-label="Niches" className="flex flex-wrap gap-1.5">
+            <StepTitle title="Your profile" body="Used to match you with campaigns in your field. You can change it anytime." />
+            <Field label="What are your areas of expertise?" hint="Pick all that apply, e.g. AI & Machine Learning or Cybersecurity. Your first pick is your primary category.">
+              <div role="group" aria-label="Areas of expertise" className="flex flex-wrap gap-1.5">
                 {NICHES.map((n) => (
                   <ChipToggle key={n.id} pressed={niches.includes(n.id)} onPressedChange={() => setNiches((x) => toggle(x, n.id))}>
                     {niches.includes(n.id) && <Check />}
@@ -186,7 +186,7 @@ function OnboardingFlow({ creator }: { creator: Creator }) {
 
         {step === 2 && (
           <div className="space-y-4">
-            <StepTitle title="Get paid" body="Payouts are handled by Stripe. You add your bank details on Stripe's secure page; Creator Connect never sees or stores them." />
+            <StepTitle title="Get paid" body="Payouts are handled by Stripe. You add your bank details on Stripe's secure page; Klynt never sees or stores them." />
             <div className="flex items-center gap-3 rounded-xl border p-4">
               <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
                 <Landmark className="size-5 text-muted-foreground" />
@@ -233,7 +233,7 @@ function OnboardingFlow({ creator }: { creator: Creator }) {
             <div className="flex items-start gap-2.5 rounded-xl border p-3">
               <Checkbox id={authId} checked={authorized} onCheckedChange={(v) => setAuthorized(v === true)} className="mt-0.5" />
               <Label htmlFor={authId} className="text-sm leading-snug font-normal">
-                I authorize Creator Connect to read my view, engagement and audience metrics on connected accounts (read-only). I can revoke access anytime.
+                I authorize Klynt to read my view, engagement and audience metrics on connected accounts (read-only). I can revoke access anytime.
               </Label>
             </div>
           </div>
@@ -246,8 +246,8 @@ function OnboardingFlow({ creator }: { creator: Creator }) {
             </span>
             <h2 className="mt-4 text-lg font-semibold tracking-tight">You&apos;re all set</h2>
             <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-              {connected.length} {connected.length === 1 ? "account" : "accounts"} connected · {niches.length} {niches.length === 1 ? "niche" : "niches"}
-              {stripe ? " · payouts ready" : " · connect payouts before your first payout"}. Offers land in your inbox as brands match with you.
+              {connected.length} {connected.length === 1 ? "account" : "accounts"} connected · {niches.length} {niches.length === 1 ? "category" : "categories"}
+              {stripe ? " · payouts ready" : " · connect payouts before your first payout"}. Sponsorship offers relevant to your expertise and audience land in your inbox as you&apos;re matched to campaigns.
             </p>
             <Button asChild className="mt-5 h-11 rounded-xl px-5">
               <Link href="/creator">

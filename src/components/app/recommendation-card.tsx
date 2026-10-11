@@ -1,19 +1,20 @@
 "use client";
 
-import { Check, MapPin, Sparkles, X } from "lucide-react";
+import { Check, MapPin, Sparkles, Timer, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PLATFORMS, PlatformIcon } from "@/components/platform-icon";
 import { COUNTRY_FLAGS, compact, usd } from "@/lib/domain/format";
 import { NICHE_LABEL } from "@/lib/domain/labels";
 import type { MatchResult } from "@/lib/domain/matching";
 import type { Activation } from "@/lib/domain/types";
+import { hoursToPair } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { Photo } from "./photo";
 import { CreatorPhoto } from "./creator-photo";
 import { FactorBars, MatchRing } from "./match-breakdown";
 import { ActivationBadge } from "./status-badge";
 
-/** Creator recommendation with everything needed to approve a fixed-fee offer. */
+/** A matched creator with everything needed to decide before they pair automatically. */
 export function RecommendationCard({
   match,
   activation,
@@ -24,7 +25,7 @@ export function RecommendationCard({
   readOnly,
 }: {
   match: MatchResult;
-  activation: Pick<Activation, "status" | "fee" | "estViews" | "platform" | "replacementFor" | "supplementary">;
+  activation: Pick<Activation, "status" | "fee" | "estViews" | "platform" | "replacementFor" | "supplementary" | "autoPairAt">;
   onOpen: () => void;
   onApprove?: () => void;
   onRemove?: () => void;
@@ -52,8 +53,15 @@ export function RecommendationCard({
           </span>
         ))}
       </button>
-      {activation.replacementFor && pending && (
-        <span className="absolute top-2 left-2 rounded-md bg-warning px-1.5 py-0.5 text-[10px] font-semibold text-black">Replacement</span>
+      {pending && (
+        <span className="absolute top-2 left-2 flex gap-1">
+          {activation.autoPairAt && (
+            <span className="inline-flex items-center gap-1 rounded-md bg-background/90 px-1.5 py-0.5 text-[10px] font-semibold shadow-card backdrop-blur">
+              <Timer className="size-3" /> Pairs in {hoursToPair(activation)}h
+            </span>
+          )}
+          {activation.replacementFor && <span className="rounded-md bg-warning px-1.5 py-0.5 text-[10px] font-semibold text-black">Replacement</span>}
+        </span>
       )}
       <div className="flex flex-1 flex-col px-4 pb-4">
         <div className="-mt-6 flex items-end justify-between">
@@ -114,12 +122,13 @@ export function RecommendationCard({
           </div>
           {!readOnly && pending && (
             <div className="flex gap-1.5">
-              <Button size="icon-sm" variant="outline" aria-label={`Remove ${c.name}`} onClick={onRemove}>
+              <Button size="sm" variant="outline" aria-label={`Decline ${c.name}`} onClick={onRemove}>
                 <X />
+                Decline
               </Button>
               <Button size="sm" onClick={onApprove}>
                 <Check />
-                Approve
+                Pair now
               </Button>
             </div>
           )}

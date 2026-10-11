@@ -56,7 +56,7 @@ export function Work() {
     counts.changes && `${counts.changes} with changes requested`,
     counts.toPost && `${counts.toPost} ready to post`,
     counts.todo && `${counts.todo} to create`,
-    counts.receive && `${counts.receive} waiting for product`,
+    counts.receive && `${counts.receive} waiting for access`,
     counts.review && `${counts.review} in review`,
     counts.verifying && `${counts.verifying} verifying`,
   ].filter(Boolean);
@@ -72,7 +72,7 @@ export function Work() {
         <EmptyState
           icon={Briefcase}
           title="No deliverables yet"
-          description="Accept an offer and its posts show up here with due dates, brand feedback and the next step for each."
+          description="Accept a sponsorship offer and its posts show up here with due dates, brand feedback and the next step for each."
           action={
             <Button asChild variant="outline">
               <Link href="/creator">

@@ -156,7 +156,7 @@ export function OverviewTab({ campaign, sets, activations, posts, rollup: r, goT
             ))}
           </ul>
           <p className="mt-4 border-t pt-3 text-xs text-muted-foreground">
-            Includes a {PLATFORM_FEE_RATE * 100}% platform fee on creator fees.{" "}
+            Includes Klynt&apos;s {PLATFORM_FEE_RATE * 100}% fee on the creator prices you set.{" "}
             {campaign.allocation === "automatic" ? "Uncommitted budget is allocated automatically to future invitations; accepted fees never change." : "Allocated manually per creator set."}
           </p>
           {r.results > 0 && (
@@ -248,7 +248,7 @@ export function OverviewTab({ campaign, sets, activations, posts, rollup: r, goT
               return (
                 <li key={i.id}>
                   <Link href={`/business/inbox?item=${i.id}`} className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted/40">
-                    {c ? <CreatorPhoto creator={c} size={28} /> : <span className="size-7 rounded-full bg-warning-subtle" />}
+                    {c ? <CreatorPhoto creator={c} size={28} /> : <span className="size-7 rounded-none bg-warning-subtle" />}
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-medium">{i.title}</span>
                       <span className="block truncate text-xs text-muted-foreground">{i.body}</span>

@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import { FieldLabel, FormSection, Helper, MoneyInput } from "./form-section";
 
 const OBJ_ICON: Record<Objective, typeof Sparkles> = { awareness: Sparkles, traffic: MousePointerClick, leads: UserPlus, sales: ShoppingBag, app: Download };
-const IMAGES = ["c-brushes", "c-serum-white", "c-jars", "c-pump", "c-tube", "c-amber"];
+const IMAGES = ["t-mic", "t-ai", "t-code-screen", "t-dashboard", "t-security", "t-servers"];
 
 export function CampaignForm({ campaign: c, onChange, live = false }: { campaign: Campaign; onChange: (fn: (c: Campaign) => Campaign) => void; live?: boolean }) {
   const update = (patch: Partial<Campaign>) => onChange((x) => ({ ...x, ...patch }));
@@ -24,7 +24,7 @@ export function CampaignForm({ campaign: c, onChange, live = false }: { campaign
   return (
     <div className="space-y-5">
       <FormSection title="Campaign name">
-        <Input className="h-9" value={c.name} onChange={(e) => update({ name: e.target.value })} placeholder="e.g. Spring lip oil launch" aria-label="Campaign name" />
+        <Input className="h-9" value={c.name} onChange={(e) => update({ name: e.target.value })} placeholder="e.g. Kestrel 2 launch" aria-label="Campaign name" />
       </FormSection>
 
       <FormSection title="Objective" description={live ? "The objective can't change after a campaign is published." : "Sets the main metric in your reports. Guarantees are always on verified organic views; sales, leads and installs are tracked, not guaranteed."}>
@@ -80,7 +80,7 @@ export function CampaignForm({ campaign: c, onChange, live = false }: { campaign
             )}
             <div>
               <FieldLabel htmlFor="pdesc" hint="Creators read this first">Description</FieldLabel>
-              <Textarea id="pdesc" rows={3} className="resize-none" value={c.promoting.description} onChange={(e) => promo({ description: e.target.value })} placeholder={c.promoting.kind === "brand" ? "What your brand stands for and who it's for" : "What it is, who it's for, why it's different"} />
+              <Textarea id="pdesc" rows={3} className="resize-none" value={c.promoting.description} onChange={(e) => promo({ description: e.target.value })} placeholder={c.promoting.kind === "brand" ? "What your company does and who it's for" : "What it does, who it's for, why it's different"} />
             </div>
             <div>
               <FieldLabel htmlFor="purl">Website or landing page</FieldLabel>
@@ -103,13 +103,13 @@ export function CampaignForm({ campaign: c, onChange, live = false }: { campaign
               ))}
             </div>
             <button type="button" onClick={() => toast("Upload (demo)")} className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed py-2 text-xs text-muted-foreground hover:bg-muted/40">
-              <Upload className="size-3.5" /> Upload images or brand assets
+              <Upload className="size-3.5" /> Upload screenshots or brand assets
             </button>
           </div>
         </div>
       </FormSection>
 
-      <FormSection title="Budget & dates" description="One total budget covers creator fees and a 10% platform fee. You'll see each creator's fixed fee before anything is committed.">
+      <FormSection title="Budget & dates" description="One total budget covers the creator prices you set in each creator set, plus Klynt's 1% fee. Nothing is committed until a creator accepts.">
         <div className="grid gap-5 sm:grid-cols-3">
           <div>
             <FieldLabel>Total budget</FieldLabel>

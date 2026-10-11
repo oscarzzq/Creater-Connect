@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Creator Connect — Launch creator campaigns like ads",
-  description: "SMEs build campaigns like ads, get auto-matched to creators, and creators accept offers in one tap.",
+  title: "Klynt — B2B creator marketing platform",
+  description: "Reach the right professional audiences through trusted industry creators. Klynt matches B2B campaigns in AI, developer tools, cybersecurity, SaaS and fintech with relevant creators, and pays on verified views.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

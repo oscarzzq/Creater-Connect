@@ -2,13 +2,13 @@
 // Creator-posted organic distribution is the only campaign type; paid-usage
 // rights are an optional add-on in the brief.
 
-export type Platform = "tiktok" | "instagram" | "youtube";
+export type Platform = "linkedin" | "x" | "youtube" | "newsletter";
 
 export type Objective = "awareness" | "traffic" | "leads" | "sales" | "app";
 
 export type NicheId =
-  | "fashion" | "beauty" | "fitness" | "food" | "tech" | "gaming" | "education" | "business" | "finance"
-  | "lifestyle" | "home" | "entertainment" | "parenting" | "sports" | "automotive" | "pets" | "other";
+  | "ai" | "devtools" | "cloud" | "security" | "data" | "saas" | "fintech" | "product"
+  | "webdev" | "leadership" | "startups" | "careers" | "other";
 
 /** Stored lifecycle. Active campaigns get a finer display stage from `campaignStage()`. */
 export type CampaignStatus = "draft" | "active" | "make_good" | "completed" | "cancelled";
@@ -22,9 +22,9 @@ export type CtaType = "website" | "promo_code" | "tracked_link" | "link_in_bio" 
 export interface Brief {
   benefits: string[];
   intendedAudience: string;
-  format: "short_video" | "image" | "carousel";
+  format: "video" | "post" | "carousel";
   deliverables: number; // posts per creator
-  videoLength: string; // e.g. "30–45s"
+  videoLength: string; // length guidance, e.g. "1–3 min" or "Long-form post"
   tone: string;
   talkingPoints: string[];
   mandatoryDemo: string;
@@ -57,7 +57,7 @@ export interface Campaign {
   objective: Objective;
   promoting: { kind: "product" | "service" | "brand"; name: string; description: string; url: string; image: string };
   status: CampaignStatus;
-  budget: number; // all-in: creator fees + platform fee
+  budget: number; // all-in: creator fees + 1% Klynt fee
   startDate: string;
   endDate: string;
   allocation: "automatic" | "manual";
@@ -83,9 +83,7 @@ export interface CreatorSet {
   qualification: { minMedianViews: number; followerRange?: [number, number] };
   budget?: number; // manual allocation cap; automatic sets derive from roster
   creatorCount?: [number, number];
-  /** Automatic: we pick and invite creators within your rules. Manual: you approve each one. */
-  selection: "automatic" | "manual";
-  maxFee?: number; // cap on any single creator's fixed fee
+  price: number; // fixed fee each creator in this set is offered (Klynt adds 1% on top)
   includeCreators: string[]; // creators you asked for (invited first if they qualify)
   excludeCreators: string[];
   /** The set's ad: its creative brief. Undefined = use the campaign's default brief. */
@@ -153,6 +151,8 @@ export interface Activation {
   expiresAt?: string;
   declineReason?: string;
   replacementFor?: string; // activation id this one replaces
+  /** Matched creators pair automatically at this time unless the brand declines first. */
+  autoPairAt?: string;
   supplementary?: boolean; // added at platform expense (make-good)
   fulfillment: "not_needed" | "pending" | "shipped" | "delivered";
   messages: Message[];

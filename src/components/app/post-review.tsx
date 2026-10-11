@@ -70,7 +70,7 @@ export function PostReview({
               <div className="absolute inset-x-3 top-3 flex items-center gap-2">
                 {creator && <CreatorPhoto creator={creator} size={24} />}
                 <span className="text-xs font-semibold text-white">{creator?.handle}</span>
-                <span className="ml-auto rounded bg-white/15 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur">{started ? `v${post.version}` : "Not submitted"}</span>
+                <span className="ml-auto rounded-none bg-white/15 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur">{started ? `v${post.version}` : "Not submitted"}</span>
               </div>
               {started ? (
                 <>
@@ -79,7 +79,7 @@ export function PostReview({
                     <button type="button" onClick={() => setPlaying((p) => !p)} className="text-white" aria-label={playing ? "Pause preview" : "Play preview"}>
                       {playing ? <Pause className="size-4 fill-current" /> : <Play className="size-4 fill-current" />}
                     </button>
-                    <div className="h-0.5 flex-1 overflow-hidden rounded-full bg-white/30">
+                    <div className="h-0.5 flex-1 overflow-hidden rounded-none bg-white/30">
                       <div className="h-full bg-white" style={{ animation: `progress ${post.duration}s linear infinite`, animationPlayState: playing ? "running" : "paused" }} />
                     </div>
                     <span className="text-[10px] text-white/80 tabular-nums">{formatDuration(post.duration)}</span>
@@ -187,7 +187,7 @@ export function PostReview({
                 <ol className="space-y-2.5">
                   {timeline.map((t) => (
                     <li key={t.label} className="flex items-center gap-3 text-sm">
-                      <span className={cn("flex size-5 items-center justify-center rounded-full border", t.at ? "border-success bg-success text-white" : "border-dashed bg-card")}>{t.at && <Check className="size-3" strokeWidth={3} />}</span>
+                      <span className={cn("flex size-5 items-center justify-center rounded-none border", t.at ? "border-success bg-success text-white" : "border-dashed bg-card")}>{t.at && <Check className="size-3" strokeWidth={3} />}</span>
                       <span className={cn("flex-1", !t.at && "text-muted-foreground")}>{t.label}</span>
                       <span className="text-xs text-muted-foreground tabular-nums">{t.at ? shortDate(t.at) : "—"}</span>
                     </li>
@@ -201,7 +201,7 @@ export function PostReview({
               {revising && (
                 <section>
                   <h3 className="mb-2 text-sm font-semibold">What should change?</h3>
-                  <Textarea autoFocus rows={3} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Be specific: timestamps, shots, wording. The creator sees exactly this." className="resize-none" />
+                  <Textarea autoFocus rows={3} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Be specific: timestamps, technical accuracy, wording. The creator sees exactly this." className="resize-none" />
                 </section>
               )}
             </div>

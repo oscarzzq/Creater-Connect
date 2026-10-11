@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Bot, Copy, FlaskConical, Hand, Pencil, UserRoundPlus } from "lucide-react";
+import { Copy, FlaskConical, Pencil, UserRoundPlus } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { CreatorPhoto } from "@/components/app/creator-photo";
 import { useOverlays } from "@/components/app/overlays";
 import { RosterApproval } from "@/components/app/roster-approval";
+import { declineToast } from "@/components/app/decline-toast";
 import { ActivationBadge, StatusPill } from "@/components/app/status-badge";
 import type { DetailProps } from "./types";
 
@@ -60,10 +61,6 @@ export function SetsTab({ campaign, sets, activations, posts, focusSet }: Detail
                 {s.hypothesis && <p className="mt-0.5 text-sm text-muted-foreground">Hypothesis: {s.hypothesis}</p>}
               </div>
               <div className="flex gap-2">
-                <span className="inline-flex h-7 items-center gap-1.5 rounded-md bg-muted px-2 text-xs font-medium text-muted-foreground">
-                  {s.selection === "automatic" ? <Bot className="size-3.5" /> : <Hand className="size-3.5" />}
-                  {s.selection === "automatic" ? "Automatic selection" : "Manual review"}
-                </span>
                 <Button size="sm" variant="outline" asChild>
                   <Link href={`/business/campaigns/${campaign.id}/edit?node=set:${s.id}`}>
                     <Pencil /> Edit
@@ -74,10 +71,7 @@ export function SetsTab({ campaign, sets, activations, posts, focusSet }: Detail
                   Duplicate
                 </Button>
                 {campaign.status === "active" && (
-                  <Button size="sm" variant="outline" onClick={() => {
-                    if (s.selection === "automatic") { actions.fillRoster(s.id); toast("Inviting more creators within this set's budget"); }
-                    else { actions.requestAlternatives(s.id); toast("Added more recommended creators"); }
-                  }}>
+                  <Button size="sm" variant="outline" onClick={() => { actions.fillRoster(s.id); toast("Matched more creators within this set's budget", { description: "They pair in 24 hours unless you decline." }); }}>
                     <UserRoundPlus />
                     More creators
                   </Button>
@@ -106,17 +100,22 @@ export function SetsTab({ campaign, sets, activations, posts, focusSet }: Detail
 
             {reviewing.length > 0 && (
               <div className="border-t bg-canvas/60 p-4">
-                <div className="mb-3 flex items-center gap-2">
-                  <StatusPill tone="warning">Needs your approval</StatusPill>
+                <div className="mb-3 flex flex-wrap items-center gap-2">
+                  <StatusPill tone="warning">New matches · 24h to decline</StatusPill>
                   <span className="text-xs text-muted-foreground">{campaign.allocation === "automatic" ? `Predicted allocation ${usd(setBudget)}` : `Manual allocation ${usd(setBudget)}`}</span>
+                  {campaign.status === "active" && reviewing.some((a) => a.status === "recommended") && (
+                    <button type="button" className="ml-auto text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline" onClick={() => { actions.simulatePairing(campaign.id); toast("Skipped ahead 24 hours", { description: "Pending matches paired and their offers went out." }); }}>
+                      Simulate 24 hours passing (demo)
+                    </button>
+                  )}
                 </div>
                 <RosterApproval
                   set={s}
                   campaign={campaign}
                   items={reviewing}
                   budget={setBudget}
-                  onApprove={(ids) => { actions.approve(ids); toast.success(campaign.status === "draft" ? `${ids.length} approved` : `${ids.length} invited`, { description: campaign.status === "draft" ? "Offers go out when you launch." : "Creators have 7 days to accept." }); }}
-                  onRemove={(id) => actions.remove(id)}
+                  onApprove={(ids) => { actions.approve(ids); toast.success(campaign.status === "draft" ? `${ids.length} approved` : `Paired with ${ids.length} creator${ids.length > 1 ? "s" : ""}`, { description: campaign.status === "draft" ? "Offers go out when you launch." : "Creators have 7 days to accept." }); }}
+                  onRemove={(id) => declineToast(activations.find((a) => a.id === id)!.creatorId, actions.exclude(id))}
                   onUndo={(id) => actions.unapprove(id)}
                   onAlternatives={() => { actions.requestAlternatives(s.id); toast("Added alternative recommendations"); }}
                   onOpenCreator={(id) => openCreator(id, s.id)}

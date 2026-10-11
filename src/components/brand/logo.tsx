@@ -19,9 +19,9 @@ export function LogoMark({ className }: { className?: string }) {
 
 export function Logo({ className }: { className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-2 font-semibold tracking-tight", className)}>
+    <span className={cn("inline-flex items-center gap-2 font-semibold tracking-tight whitespace-nowrap", className)}>
       <LogoMark />
-      <span>Creator Connect</span>
+      <span>Klynt</span>
     </span>
   );
 }

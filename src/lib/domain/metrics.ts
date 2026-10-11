@@ -76,10 +76,10 @@ export function resultKind(objective: Objective): "verified" | "attributed" {
 
 export interface Rollup {
   budget: number;
-  committed: number; // accepted fees incl. platform fee
+  committed: number; // accepted fees incl. Klynt fee
   reserved: number; // invited/approved, not yet accepted
   proposed: number; // recommended, awaiting your approval
-  spent: number; // paid fees incl. platform fee
+  spent: number; // paid fees incl. Klynt fee
   available: number;
   creators: { recommended: number; approved: number; invited: number; accepted: number; declined: number; replacement: number; supplementary: number };
   posts: Record<PostStatus, number> & { total: number };
@@ -257,12 +257,12 @@ export function inboxItems(w: World, businessId: string): InboxItem[] {
     const acts = w.activations.filter((a) => a.campaignId === c.id);
     const ps = w.posts.filter((p) => p.campaignId === c.id);
 
-    // Manual creator sets wait for the brand to approve recommendations.
+    // New matches wait 24 hours for the brand to decline before pairing automatically.
     const recs = acts.filter((a) => a.status === "recommended" && !a.replacementFor);
     if (recs.length)
       items.push({
         id: `recs-${c.id}-${recs.length}`, category: "offers", needsAction: true, kind: "review_recommendations",
-        title: `${recs.length} recommended creators to approve`, body: `${c.name} · manual creator selection`, at: c.launchedAt ?? c.createdAt, campaignId: c.id, setId: recs[0].setId,
+        title: `${recs.length} new creator match${recs.length > 1 ? "es" : ""} · pairing in 24h`, body: `${c.name} · decline anyone who isn't right`, at: c.launchedAt ?? c.createdAt, campaignId: c.id, setId: recs[0].setId,
       });
 
     for (const a of acts) {
@@ -271,7 +271,7 @@ export function inboxItems(w: World, businessId: string): InboxItem[] {
         const old = acts.find((x) => x.id === a.replacementFor);
         items.push({
           ...base, id: `repl-${a.id}`, category: "offers", needsAction: true, kind: "replacement",
-          title: `${old ? first(old.creatorId) : "A creator"} declined · replacement ready`,
+          title: `${old ? first(old.creatorId) : "A creator"} declined · replacement matched`,
           body: `${name(a.creatorId)} · ${usd(a.fee)} · ~${compact(a.estViews[1])} views · ${c.name}`, at: old?.respondedAt ?? c.createdAt,
         });
       }
@@ -284,7 +284,7 @@ export function inboxItems(w: World, businessId: string): InboxItem[] {
         items.push({
           ...base, id: `inv-${a.id}`, category: "offers", needsAction: false, kind: "invited",
           title: old ? `${first(old.creatorId)} ${old.status === "removed" ? "removed" : "declined"} · ${name(a.creatorId)} invited instead` : `Offer sent to ${name(a.creatorId)}`,
-          body: `${old ? "Automatic replacement · " : ""}Expires ${a.expiresAt ? daysLeftLabel(a.expiresAt) : ""} · ${c.name}`, at: a.invitedAt,
+          body: `${old ? "Paired automatically · " : ""}Expires ${a.expiresAt ? daysLeftLabel(a.expiresAt) : ""} · ${c.name}`, at: a.invitedAt,
         });
       }
       const last = a.messages.at(-1);

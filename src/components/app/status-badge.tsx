@@ -47,7 +47,7 @@ export function DataTag({ kind, className }: { kind: "verified" | "attributed" |
     guaranteed: "text-foreground ring-1 ring-foreground/20",
   }[kind];
   return (
-    <span className={cn("inline-flex h-4 shrink-0 items-center gap-1 rounded px-1 text-[10px] font-medium tracking-wide uppercase", styles, className)}>
+    <span className={cn("inline-flex h-4 shrink-0 items-center gap-1 rounded-none px-1 text-[10px] font-medium tracking-wide uppercase", styles, className)}>
       {kind === "verified" && <span className="size-1 rounded-full bg-success" />}
       {kind}
     </span>

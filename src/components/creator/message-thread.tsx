@@ -12,8 +12,8 @@ import type { Activation, Campaign } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
 import { BrandMark } from "./brand-mark";
 
-const TOPICS_OFFER = ["Question about the brief", "Can I film it differently?", "Timeline question"];
-const TOPICS_ACTIVE = ["Product hasn't arrived", "Question about the brief", "I need more time", "Problem posting"];
+const TOPICS_OFFER = ["Question about the brief", "Can I adapt the format?", "Timeline question"];
+const TOPICS_ACTIVE = ["Product access issue", "Question about the brief", "I need more time", "Problem posting"];
 
 function time(iso: string) {
   const [, t] = iso.split("T");
@@ -72,7 +72,7 @@ export function MessageThread({ activation, campaign, readOnly = false, classNam
                 aria-pressed={topic === t}
                 onClick={() => setTopic(topic === t ? null : t)}
                 className={cn(
-                  "inline-flex h-7 items-center rounded-full border px-2.5 text-xs transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50",
+                  "inline-flex h-7 items-center rounded-none border px-2.5 text-xs transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50",
                   topic === t && "border-primary/40 bg-brand-subtle text-brand-subtle-foreground hover:bg-brand-subtle"
                 )}
               >
@@ -91,7 +91,7 @@ export function MessageThread({ activation, campaign, readOnly = false, classNam
               if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) send();
             }}
             rows={2}
-            placeholder={activation.status === "accepted" ? "Describe the question or issue…" : "e.g. Can I film this as part of my night routine?"}
+            placeholder={activation.status === "accepted" ? "Describe the question or issue…" : "e.g. Can I cover this in my weekly systems design breakdown?"}
             className="resize-none"
           />
           <Button variant="outline" className="h-9 w-full" disabled={!text.trim()} onClick={send}>

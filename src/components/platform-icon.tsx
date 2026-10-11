@@ -1,16 +1,21 @@
-import { FaInstagram, FaTiktok, FaYoutube } from "react-icons/fa6";
+import { FaEnvelopeOpenText, FaLinkedin, FaXTwitter, FaYoutube } from "react-icons/fa6";
 import { cn } from "@/lib/utils";
 import type { Platform } from "@/lib/domain/types";
 
 export type { Platform };
 
-export const PLATFORMS: Record<Platform, { label: string; short: string; format: string; icon: typeof FaInstagram; color: string; tint: string }> = {
-  tiktok: { label: "TikTok", short: "TikTok", format: "TikTok video", icon: FaTiktok, color: "text-foreground", tint: "bg-foreground/8" },
-  instagram: { label: "Instagram Reels", short: "Reels", format: "Reel", icon: FaInstagram, color: "text-[#E1306C]", tint: "bg-[#E1306C]/10" },
-  youtube: { label: "YouTube Shorts", short: "Shorts", format: "Short", icon: FaYoutube, color: "text-[#FF0000]", tint: "bg-[#FF0000]/10" },
+/**
+ * `format` is the native unit for a single sponsored post; `unit` is what the platform
+ * reports as reach (we call it "views" product-wide).
+ */
+export const PLATFORMS: Record<Platform, { label: string; short: string; format: string; unit: string; icon: typeof FaLinkedin; color: string; tint: string }> = {
+  linkedin: { label: "LinkedIn", short: "LinkedIn", format: "LinkedIn post", unit: "impressions", icon: FaLinkedin, color: "text-[#0A66C2]", tint: "bg-[#0A66C2]/10" },
+  x: { label: "X (Twitter)", short: "X", format: "post on X", unit: "views", icon: FaXTwitter, color: "text-foreground", tint: "bg-foreground/8" },
+  youtube: { label: "YouTube", short: "YouTube", format: "YouTube video", unit: "views", icon: FaYoutube, color: "text-[#FF0000]", tint: "bg-[#FF0000]/10" },
+  newsletter: { label: "Newsletter", short: "Newsletter", format: "newsletter feature", unit: "opens", icon: FaEnvelopeOpenText, color: "text-primary", tint: "bg-primary/10" },
 };
 
-export const PLATFORM_ORDER: Platform[] = ["tiktok", "instagram", "youtube"];
+export const PLATFORM_ORDER: Platform[] = ["linkedin", "x", "youtube", "newsletter"];
 
 export function PlatformIcon({ platform, className, muted = false }: { platform: Platform; className?: string; muted?: boolean }) {
   const p = PLATFORMS[platform];

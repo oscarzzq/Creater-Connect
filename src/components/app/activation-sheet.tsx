@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, RefreshCw, Send, X } from "lucide-react";
+import { ArrowRight, Check, Send, X } from "lucide-react";
 import { toast } from "sonner";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { PLATFORMS, PlatformIcon } from "@/components/platform-icon";
-import { actions, useAppState } from "@/lib/store";
+import { PAIR_WINDOW_HOURS, actions, hoursToPair, useAppState } from "@/lib/store";
 import { creatorById } from "@/lib/domain/creators";
 import { compact, relative, shortDate, usd } from "@/lib/domain/format";
 import { ACTIVATION_STATUS } from "@/lib/domain/labels";
@@ -17,6 +17,7 @@ import { payment, sum } from "@/lib/domain/metrics";
 import { cn } from "@/lib/utils";
 import { CreatorPhoto } from "./creator-photo";
 import { PostCard } from "./post-card";
+import { declineToast } from "./decline-toast";
 import { ActivationBadge, DataTag } from "./status-badge";
 
 export function ActivationSheet({
@@ -48,8 +49,8 @@ export function ActivationSheet({
   const fulfillmentNeeded = brief.fulfillment.kind !== "none";
 
   const steps: { label: string; at?: string; done: boolean; note?: string }[] = [
-    { label: "Recommended by matching", done: true },
-    { label: "Approved by you", at: a.approvedAt, done: !!a.approvedAt },
+    { label: "Matched from connected-account data", done: true },
+    { label: "Paired (you didn't decline within 24h)", at: a.approvedAt, done: !!a.approvedAt, note: a.status === "recommended" ? `Pairs in ${hoursToPair(a) ?? PAIR_WINDOW_HOURS}h` : undefined },
     { label: "Invited", at: a.invitedAt, done: !!a.invitedAt, note: a.status === "invited" && a.expiresAt ? `Expires ${shortDate(a.expiresAt)}` : undefined },
     { label: a.status === "declined" || a.status === "replacement_required" ? "Declined" : "Accepted", at: a.respondedAt, done: !!a.respondedAt && a.status === "accepted" },
     ...(fulfillmentNeeded ? [{ label: brief.fulfillment.kind === "ship" ? "Product delivered" : "Access granted", done: a.fulfillment === "delivered", note: a.fulfillment === "shipped" ? "Shipped" : undefined }] : []),
@@ -87,7 +88,7 @@ export function ActivationSheet({
             </div>
             {replaced && (
               <p className="mt-3 rounded-lg bg-warning-subtle/60 px-3 py-2 text-xs text-warning-text">
-                Suggested replacement for {creatorById(replaced.creatorId)?.name}, who declined: “{replaced.declineReason}”
+                Matched to replace {creatorById(replaced.creatorId)?.name}, who declined{replaced.declineReason ? `: “${replaced.declineReason}”` : "."}
               </p>
             )}
             {a.declineReason && (a.status === "declined" || a.status === "replacement_required") && (
@@ -99,7 +100,7 @@ export function ActivationSheet({
             <div className="bg-popover p-4">
               <dt className="text-xs text-muted-foreground">{a.supplementary ? "Fee (covered by us)" : "Fixed fee"}</dt>
               <dd className="mt-0.5 font-semibold tabular-nums">{usd(a.fee)}</dd>
-              {!a.supplementary && <dd className="text-[11px] text-muted-foreground tabular-nums">+{usd(a.fee * PLATFORM_FEE_RATE)} platform fee</dd>}
+              {!a.supplementary && <dd className="text-[11px] text-muted-foreground tabular-nums">+{usd(a.fee * PLATFORM_FEE_RATE)} Klynt fee (1%)</dd>}
             </div>
             <div className="bg-popover p-4">
               <dt className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -124,7 +125,7 @@ export function ActivationSheet({
             <ol className="space-y-2.5">
               {steps.map((s) => (
                 <li key={s.label} className="flex items-center gap-3 text-sm">
-                  <span className={cn("flex size-5 shrink-0 items-center justify-center rounded-full border", s.done ? "border-success bg-success text-white" : "border-dashed bg-card")}>
+                  <span className={cn("flex size-5 shrink-0 items-center justify-center rounded-none border", s.done ? "border-success bg-success text-white" : "border-dashed bg-card")}>
                     {s.done && <Check className="size-3" strokeWidth={3} />}
                   </span>
                   <span className={cn("flex-1", !s.done && "text-muted-foreground")}>{s.label}</span>
@@ -183,21 +184,15 @@ export function ActivationSheet({
 
         {(a.status === "recommended" || a.status === "approved") && (
           <div className="flex items-center justify-between gap-2 border-t bg-popover px-6 py-4">
-            <Button variant="ghost" className="h-9" onClick={() => { actions.remove(a.id); toast(`${first} removed`); onOpenChange(false); }}>
+            <Button variant="ghost" className="h-9" onClick={() => { declineToast(a.creatorId, actions.exclude(a.id)); onOpenChange(false); }}>
               <X />
-              Remove
+              Decline
             </Button>
             <div className="flex gap-2">
-              {a.replacementFor && (
-                <Button variant="outline" className="h-9" onClick={() => { actions.nextReplacement(a.id); toast("Showing the next comparable creator"); onOpenChange(false); }}>
-                  <RefreshCw />
-                  Suggest another
-                </Button>
-              )}
               {a.status === "recommended" && (
-                <Button className="h-9" onClick={() => { actions.approve([a.id]); toast.success(campaign.status === "draft" ? `${first} approved` : `${first} invited`, { description: campaign.status === "draft" ? "They'll be invited when you launch." : "They have 7 days to accept." }); }}>
+                <Button className="h-9" onClick={() => { actions.approve([a.id]); toast.success(campaign.status === "draft" ? `${first} approved` : `Paired with ${first}`, { description: campaign.status === "draft" ? "They'll be invited when you launch." : "They have 7 days to accept." }); }}>
                   <Check />
-                  {campaign.status === "draft" ? "Approve" : "Approve & invite"}
+                  {campaign.status === "draft" ? "Approve" : "Pair now"}
                 </Button>
               )}
               {a.status === "approved" && (

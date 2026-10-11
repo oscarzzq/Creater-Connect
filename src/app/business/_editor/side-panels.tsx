@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Heart, MessageCircle, Music2, Send } from "lucide-react";
 import { PLATFORMS, PlatformIcon } from "@/components/platform-icon";
 import { CreatorPhoto, CreatorStack } from "@/components/app/creator-photo";
 import { MatchBreakdown } from "@/components/app/match-breakdown";
@@ -54,9 +53,9 @@ export function CampaignPanel({ campaign, sets, budgets, live }: { campaign: Cam
         <dl className="space-y-2 text-sm">
           <Row k="Budget" v={usd(campaign.budget)} />
           <Row k={`Creators (${sets.length} set${sets.length === 1 ? "" : "s"})`} v={`~${sum(f.map((x) => x.count))}`} />
-          <Row k="Fees incl. platform fee" v={usd(fees)} />
+          <Row k="Fees incl. 1% Klynt fee" v={usd(fees)} />
           <Row k="Expected views" v={`${compact(views[0])}–${compact(views[1])}`} />
-          <Row k="Guaranteed floor" v={floor ? compact(floor) : "3+ creators"} />
+          <Row k="Guaranteed view floor" v={floor ? compact(floor) : "3+ creators"} />
         </dl>
       </Card>
       <Card title="Budget by creator set">
@@ -67,8 +66,8 @@ export function CampaignPanel({ campaign, sets, budgets, live }: { campaign: Cam
                 <span className="truncate font-medium">{x.s.name}</span>
                 <span className="shrink-0 text-muted-foreground tabular-nums">{usd(x.fees)} / {usd(budgets[x.s.id])}</span>
               </div>
-              <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
-                <div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, (x.fees / Math.max(1, budgets[x.s.id])) * 100)}%` }} />
+              <div className="mt-1 h-1.5 overflow-hidden rounded-none bg-muted">
+                <div className="h-full rounded-none bg-primary" style={{ width: `${Math.min(100, (x.fees / Math.max(1, budgets[x.s.id])) * 100)}%` }} />
               </div>
             </li>
           ))}
@@ -90,7 +89,7 @@ export function SetPanel({ campaign, set, budget, live }: { campaign: Campaign; 
         <div className="text-xs text-muted-foreground">{["Your creator pool is very specific.", "Your creator pool is well defined.", "Your creator pool is broad."][breadth]}</div>
         <div className="mt-3 grid grid-cols-3 gap-1">
           {[0, 1, 2].map((i) => (
-            <span key={i} className={cn("h-1.5 rounded-full", i === breadth ? ["bg-warning", "bg-success", "bg-primary"][i] : "bg-muted")} />
+            <span key={i} className={cn("h-1.5 rounded-none", i === breadth ? ["bg-warning", "bg-success", "bg-primary"][i] : "bg-muted")} />
           ))}
         </div>
         <div className="mt-1 flex justify-between text-[11px] text-muted-foreground">
@@ -112,12 +111,12 @@ export function SetPanel({ campaign, set, budget, live }: { campaign: Campaign; 
         <div className="flex items-end justify-between">
           <div>
             <div className="text-2xl font-semibold tracking-tight tabular-nums">{fc.count}</div>
-            <div className="text-xs text-muted-foreground">{fc.live ? "creators on roster" : set.selection === "automatic" ? "creators invited at publish" : "creators recommended for review"}</div>
+            <div className="text-xs text-muted-foreground">{fc.live ? "creators on roster" : "creators matched at publish"}</div>
           </div>
           <CreatorStack creators={fc.creators} size={24} max={4} />
         </div>
         <dl className="mt-4 space-y-2 border-t pt-3 text-sm">
-          <Row k="Fees incl. platform fee" v={usd(fc.fees)} />
+          <Row k="Fees incl. 1% Klynt fee" v={usd(fc.fees)} />
           <Row k="Expected views" v={`${compact(fc.views[0])}–${compact(fc.views[2])}`} />
           <Row k="Effective CPM" v={fc.views[1] ? usd((fc.fees / fc.views[1]) * 1000, true) : "—"} />
           <Row k="Budget for this set" v={usd(budget)} />
@@ -130,7 +129,11 @@ export function SetPanel({ campaign, set, budget, live }: { campaign: Campaign; 
 
 export function AdPanel({ campaign, set }: { campaign: Campaign; set: CreatorSet }) {
   const b = briefFor(campaign, set);
-  const [platform, setPlatform] = useState<Platform>(set.platforms[0] ?? "tiktok");
+  const [picked, setPlatform] = useState<Platform>(set.platforms[0] ?? "linkedin");
+  const platform = set.platforms.includes(picked) ? picked : (set.platforms[0] ?? "linkedin");
+  const body = `${b.hooks[0] ? `${b.hooks[0]}\n\n` : ""}${b.talkingPoints[0] ?? campaign.promoting.name}`;
+  const mentions = b.requiredMentions.join(" ");
+  const disclosure = platform === "linkedin" ? `Paid partnership with ${campaign.businessName}` : platform === "newsletter" ? `Sponsored by ${campaign.businessName}` : `Sponsored · ${campaign.businessName}`;
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
@@ -143,30 +146,63 @@ export function AdPanel({ campaign, set }: { campaign: Campaign; set: CreatorSet
           ))}
         </div>
       </div>
-      <div className="mx-auto w-[240px] rounded-[28px] border-[6px] border-neutral-900 bg-neutral-900 shadow-float">
-        <div className="relative aspect-[9/16] overflow-hidden rounded-[22px] bg-neutral-800">
-          <Photo src={campaign.promoting.image} alt="" sizes="240px" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/80" />
-          {b.hooks[0] && <div className="absolute inset-x-4 top-16 rounded-lg bg-white px-2 py-1 text-center text-[12px] leading-tight font-semibold text-black">{b.hooks[0]}</div>}
-          <div className="absolute right-2 bottom-24 flex flex-col items-center gap-3 text-white">
-            <Heart className="size-5" />
-            <MessageCircle className="size-5" />
-            <Send className="size-5" />
+      <div className="mx-auto w-[260px] rounded-[28px] border-[6px] border-neutral-900 bg-neutral-900 shadow-float">
+        <div className="relative aspect-[9/16] overflow-hidden rounded-[22px] bg-white text-neutral-900">
+          <div className="flex items-center gap-1.5 border-b border-neutral-200 px-3 py-2 text-[10px] font-medium text-neutral-500">
+            <PlatformIcon platform={platform} className="size-3" />
+            {PLATFORMS[platform].label}
           </div>
-          <div className="absolute inset-x-3 bottom-3 space-y-1.5 text-white">
-            <div className="text-[12px] font-semibold">@creator</div>
-            <p className="line-clamp-2 text-[11px] leading-snug">
-              {b.talkingPoints[0] ?? campaign.promoting.name} {b.requiredMentions.join(" ")}
-            </p>
-            <div className="flex items-center gap-1 text-[10px] text-white/80">
-              <Music2 className="size-3" /> Original sound
+          {platform === "newsletter" ? (
+            <div className="space-y-2 p-3 text-[11px] leading-snug">
+              <div className="text-[13px] font-semibold">This week in AI · Issue #142</div>
+              <p className="text-neutral-500">The creator&apos;s usual intro, in their voice…</p>
+              <div className="space-y-1.5 rounded-lg border border-neutral-200 bg-neutral-50 p-2.5">
+                <div className="text-[9px] font-semibold tracking-wide text-neutral-500 uppercase">{disclosure}</div>
+                <div className="relative aspect-video overflow-hidden rounded-md bg-neutral-200">
+                  <Photo src={campaign.promoting.image} alt="" sizes="240px" />
+                </div>
+                <p className="line-clamp-4 whitespace-pre-line">{body}</p>
+                <div className="rounded-md bg-neutral-900 py-1 text-center text-[10px] font-semibold text-white">{CTAS[b.cta.type]}</div>
+              </div>
+              <p className="text-neutral-500">…and back to the rest of the issue.</p>
             </div>
-            <div className="rounded-md bg-white/90 py-1 text-center text-[11px] font-semibold text-black">{CTAS[b.cta.type]}</div>
-          </div>
-          <span className="absolute top-3 left-3 rounded bg-black/50 px-1.5 py-0.5 text-[9px] font-medium text-white">Sponsored · {campaign.businessName}</span>
+          ) : (
+            <div className="space-y-2 p-3 text-[11px] leading-snug">
+              <div className="flex items-center gap-2">
+                <span className="size-7 rounded-full bg-neutral-300" />
+                <div>
+                  <div className="text-[11px] font-semibold">Creator name</div>
+                  <div className="text-[9px] text-neutral-500">{platform === "linkedin" ? "Staff engineer · 1h" : platform === "x" ? "@creator · 1h" : "12K views · 1 hour ago"}</div>
+                </div>
+              </div>
+              <div className="text-[9px] font-medium text-neutral-500">{disclosure}</div>
+              {platform === "youtube" ? (
+                <>
+                  <div className="relative aspect-video overflow-hidden rounded-lg bg-neutral-800">
+                    <Photo src={campaign.promoting.image} alt="" sizes="240px" />
+                    {b.hooks[0] && <div className="absolute inset-x-2 bottom-2 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-semibold text-white">{b.hooks[0]}</div>}
+                  </div>
+                  <p className="line-clamp-3 text-neutral-600">{b.talkingPoints[0] ?? campaign.promoting.name} {mentions}</p>
+                </>
+              ) : (
+                <>
+                  <p className="line-clamp-6 whitespace-pre-line">{body} {mentions}</p>
+                  <div className="overflow-hidden rounded-lg border border-neutral-200">
+                    <div className="relative aspect-video bg-neutral-200">
+                      <Photo src={campaign.promoting.image} alt="" sizes="240px" />
+                    </div>
+                    <div className="flex items-center justify-between px-2 py-1.5 text-[10px]">
+                      <span className="truncate text-neutral-500">{b.cta.destination || campaign.promoting.url || campaign.businessName}</span>
+                      <span className="shrink-0 font-semibold">{CTAS[b.cta.type]}</span>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
-      <p className="text-center text-[11px] text-muted-foreground">Illustrative. Each creator films their own version in their voice.</p>
+      <p className="text-center text-[11px] text-muted-foreground">Illustrative. Each creator writes or records their own version in their voice, clearly disclosed.</p>
     </div>
   );
 }

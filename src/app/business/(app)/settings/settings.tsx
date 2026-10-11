@@ -27,9 +27,9 @@ export function Settings() {
     <div className="mx-auto w-full max-w-[1100px] space-y-5 px-4 py-6 sm:px-8 sm:py-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Brand details, team, payments and integrations.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Company profile, team, payments and integrations.</p>
       </div>
-      <Segmented value={tab} onChange={setTab} options={[["brand", "Brand"], ["team", "Team"], ["billing", "Payments & billing"], ["integrations", "Integrations"]]} />
+      <Segmented value={tab} onChange={setTab} options={[["brand", "Company"], ["team", "Team"], ["billing", "Payments & billing"], ["integrations", "Integrations"]]} />
       {tab === "brand" && <Brand />}
       {tab === "team" && <Team />}
       {tab === "billing" && <Billing />}
@@ -55,28 +55,28 @@ function Card({ title, description, children, action }: { title: string; descrip
 
 function Brand() {
   return (
-    <Card title="Brand" description="Shown to creators on every offer." action={<Button size="sm" onClick={() => toast("Saved (demo)")}>Save</Button>}>
+    <Card title="Company profile" description="Shown to creators on every offer." action={<Button size="sm" onClick={() => toast("Saved (demo)")}>Save</Button>}>
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="space-y-1.5 text-sm"><span className="font-medium">Brand name</span><Input defaultValue={BUSINESS.name} className="h-9" /></label>
+        <label className="space-y-1.5 text-sm"><span className="font-medium">Company name</span><Input defaultValue={BUSINESS.name} className="h-9" /></label>
         <label className="space-y-1.5 text-sm"><span className="font-medium">Website</span><Input defaultValue={BUSINESS.website} className="h-9" /></label>
         <label className="space-y-1.5 text-sm">
           <span className="font-medium">Industry</span>
-          <Select defaultValue="beauty">
+          <Select defaultValue="ai">
             <SelectTrigger className="h-9 w-full"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="beauty">Beauty & skincare</SelectItem>
-              <SelectItem value="food">Food & beverage</SelectItem>
-              <SelectItem value="fitness">Fitness & wellness</SelectItem>
-              <SelectItem value="tech">Consumer tech</SelectItem>
+              <SelectItem value="ai">AI & machine learning</SelectItem>
+              <SelectItem value="devtools">Developer tools</SelectItem>
+              <SelectItem value="security">Cybersecurity</SelectItem>
+              <SelectItem value="saas">Enterprise SaaS</SelectItem>
             </SelectContent>
           </Select>
         </label>
-        <label className="space-y-1.5 text-sm"><span className="font-medium">Brand handle</span><Input defaultValue="@glowinc" className="h-9" /></label>
-        <label className="space-y-1.5 text-sm sm:col-span-2"><span className="font-medium">About the brand</span><Input defaultValue={BUSINESS.tagline} className="h-9" /></label>
+        <label className="space-y-1.5 text-sm"><span className="font-medium">Social handle</span><Input defaultValue="@kestrelai" className="h-9" /></label>
+        <label className="space-y-1.5 text-sm sm:col-span-2"><span className="font-medium">About the company</span><Input defaultValue={BUSINESS.tagline} className="h-9" /></label>
         <div className="sm:col-span-2">
           <span className="text-sm font-medium">Brand assets</span>
           <button type="button" onClick={() => toast("Upload (demo)")} className="mt-1.5 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-6 text-sm text-muted-foreground hover:bg-muted/40">
-            <Upload className="size-4" /> Logos, product shots and brand guidelines
+            <Upload className="size-4" /> Logos, product screenshots and brand guidelines
           </button>
         </div>
       </div>
@@ -87,15 +87,15 @@ function Brand() {
 function Team() {
   const team = [
     [BUSINESS.user.name, BUSINESS.user.email, "Owner"],
-    ["Priya Nair", "priya@glowinc.co", "Marketing manager"],
-    ["Sam Ortiz", "sam@glowinc.co", "Approver"],
+    ["Priya Nair", "priya@kestrel.dev", "Developer marketing lead"],
+    ["Sam Ortiz", "sam@kestrel.dev", "Approver"],
   ];
   return (
     <Card title="Team" description="Who can launch campaigns and approve creators and content." action={<Button size="sm" variant="outline" onClick={() => toast("Invite sent (demo)")}><UserPlus />Invite</Button>}>
       <ul className="divide-y">
         {team.map(([name, email, role]) => (
           <li key={email} className="flex items-center gap-3 py-3">
-            <span className="flex size-8 items-center justify-center rounded-full bg-muted text-xs font-semibold">{name.split(" ").map((n) => n[0]).join("")}</span>
+            <span className="flex size-8 items-center justify-center rounded-none bg-muted text-xs font-semibold">{name.split(" ").map((n) => n[0]).join("")}</span>
             <span className="min-w-0 flex-1"><span className="block text-sm font-medium">{name}</span><span className="block text-xs text-muted-foreground">{email}</span></span>
             <span className="text-xs text-muted-foreground">{role}</span>
           </li>
@@ -145,7 +145,7 @@ function Billing() {
         {(
           [
             ["Authorized budget", usd(d.budget), "Active campaigns"],
-            ["Committed", usd(d.committed), "Accepted creator fees + platform fee"],
+            ["Committed", usd(d.committed), "Accepted creator fees + 1% Klynt fee"],
             ["Charged", usd(d.spent), "Charged as posts are verified"],
             ["Refunds & credits", usd(0), "No make-good credits issued"],
           ] as const
@@ -173,7 +173,7 @@ function Billing() {
         {d.invoices.length ? (
           <table className="w-full text-sm">
             <thead className="text-xs text-muted-foreground">
-              <tr><th className="pb-2 text-left font-medium">Period</th><th className="pb-2 text-right font-medium">Creator fees</th><th className="pb-2 text-right font-medium">Platform fee</th><th className="pb-2 text-right font-medium">Total</th><th /></tr>
+              <tr><th className="pb-2 text-left font-medium">Period</th><th className="pb-2 text-right font-medium">Creator fees</th><th className="pb-2 text-right font-medium">Klynt fee (1%)</th><th className="pb-2 text-right font-medium">Total</th><th /></tr>
             </thead>
             <tbody className="divide-y">
               {d.invoices.map((i) => (

@@ -36,8 +36,8 @@ export function FactorBars({ match, className }: { match: MatchResult; className
     <div className={cn("grid grid-cols-5 gap-1", className)}>
       {match.factors.map((f) => (
         <div key={f.key} title={`${f.label}: ${f.score}`} className="space-y-1">
-          <div className="h-1 overflow-hidden rounded-full bg-muted">
-            <div className={cn("h-full rounded-full", factorBarTone(f.score))} style={{ width: `${f.score}%` }} />
+          <div className="h-1 overflow-hidden rounded-none bg-muted">
+            <div className={cn("h-full rounded-none", factorBarTone(f.score))} style={{ width: `${f.score}%` }} />
           </div>
           <div className="truncate text-[10px] text-muted-foreground">{SHORT[f.key]}</div>
         </div>
@@ -94,8 +94,8 @@ export function MatchBreakdown({ match }: { match: MatchResult }) {
                 <span className="text-muted-foreground/60"> · {Math.round(f.weight * 100)}% weight</span>
               </span>
             </div>
-            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
-              <div className={cn("h-full rounded-full", factorBarTone(f.score))} style={{ width: `${f.score}%` }} />
+            <div className="mt-1 h-1.5 overflow-hidden rounded-none bg-muted">
+              <div className={cn("h-full rounded-none", factorBarTone(f.score))} style={{ width: `${f.score}%` }} />
             </div>
             <p className="mt-1 text-xs text-muted-foreground">{f.detail}</p>
           </div>

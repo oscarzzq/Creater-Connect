@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { CampaignDetail } from "./_components/campaign-detail";
 
-export const metadata: Metadata = { title: "Campaign · Creator Connect" };
+export const metadata: Metadata = { title: "Campaign · Klynt" };
 
 export default function CampaignPage({ params }: PageProps<"/business/campaigns/[id]">) {
   return (

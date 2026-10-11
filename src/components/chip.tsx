@@ -19,7 +19,7 @@ export function ChipToggle({
       aria-pressed={pressed}
       onClick={() => onPressedChange(!pressed)}
       className={cn(
-        "inline-flex h-8 items-center gap-1.5 rounded-full border bg-card px-3 text-sm font-medium transition-colors outline-none",
+        "inline-flex h-8 items-center gap-1.5 rounded-none border bg-card px-3 text-sm font-medium transition-colors outline-none",
         "hover:border-foreground/20 hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/40 [&_svg]:size-3.5 [&_svg]:shrink-0",
         pressed &&
           "border-primary/40 bg-brand-subtle text-brand-subtle-foreground hover:border-primary/60 hover:bg-brand-subtle",
@@ -54,7 +54,7 @@ export function Tag({
         <button
           type="button"
           onClick={onRemove}
-          className="inline-flex size-5 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+          className="inline-flex size-5 items-center justify-center rounded-none text-muted-foreground hover:bg-accent hover:text-foreground"
           aria-label="Remove"
         >
           <X className="size-3.5" />

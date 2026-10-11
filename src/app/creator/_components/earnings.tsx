@@ -190,7 +190,7 @@ function Accounts({ creator }: { creator: Creator }) {
         <h2 id="accounts-h" className="text-sm font-semibold">
           Connected accounts
         </h2>
-        <p className="mt-0.5 text-xs text-muted-foreground">Read-only. Offers are priced from your median organic views (last 20 videos).</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">Read-only. Businesses set each offer&apos;s price; your median organic reach (last 20 posts) decides which offers you&apos;re matched to.</p>
       </div>
       <ul className="mt-3 divide-y border-t">
         {PLATFORM_ORDER.map((p) => {
@@ -253,11 +253,11 @@ function Audience({ creator }: { creator: Creator }) {
         </h2>
         {verified ? <DataTag kind="verified" /> : <StatusPill tone="warning">Not verified</StatusPill>}
       </div>
-      <p className="mt-0.5 text-xs text-muted-foreground">Across your connected accounts. This is what brands are matched against.</p>
+      <p className="mt-0.5 text-xs text-muted-foreground">Across your connected accounts. The matching engine scores campaign fit against this.</p>
       <div className="mt-4 grid gap-5 sm:grid-cols-2">
         <div>
           <div className="text-xs text-muted-foreground">Gender</div>
-          <div className="mt-2 flex h-2 overflow-hidden rounded-full" aria-hidden>
+          <div className="mt-2 flex h-2 overflow-hidden rounded-none" aria-hidden>
             <div className="bg-chart-1" style={{ width: `${femalePct}%` }} />
             <div className="w-0.5 bg-card" />
             <div className="flex-1 bg-chart-2" />
@@ -290,8 +290,8 @@ function Audience({ creator }: { creator: Creator }) {
             {ages.map(([bucket, v]) => (
               <li key={bucket} className="flex items-center gap-2 text-xs">
                 <span className="w-10 text-muted-foreground tabular-nums">{bucket}</span>
-                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden>
-                  <div className="h-full rounded-full bg-chart-1" style={{ width: `${(v / maxAge) * 100}%` }} />
+                <div className="h-1.5 flex-1 overflow-hidden rounded-none bg-muted" aria-hidden>
+                  <div className="h-full rounded-none bg-chart-1" style={{ width: `${(v / maxAge) * 100}%` }} />
                 </div>
                 <span className="w-8 text-right tabular-nums">{v}%</span>
               </li>

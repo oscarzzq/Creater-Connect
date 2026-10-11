@@ -147,7 +147,7 @@ export function OfferDetail({ params }: { params: Promise<{ id: string }> }) {
                 <h2 id="progress-h" className="text-sm font-semibold">
                   Your progress
                 </h2>
-                <Link href="/creator/work" className="rounded text-xs font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50">
+                <Link href="/creator/work" className="rounded-none text-xs font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50">
                   All work
                 </Link>
               </div>
@@ -279,7 +279,7 @@ function Deliverables({ item }: { item: CreatorItem }) {
           <h2 id="deliver-h" className="text-sm font-semibold">
             What you&apos;ll deliver
           </h2>
-          <p className="text-xs text-muted-foreground">Posted organically from your {PLATFORMS[a.platform].label} account</p>
+          <p className="text-xs text-muted-foreground">Posted organically from your {PLATFORMS[a.platform].label} account, clearly disclosed</p>
         </div>
       </div>
       <dl className="mt-3 divide-y border-t">
@@ -323,7 +323,7 @@ function CreativeBrief({ item }: { item: CreatorItem }) {
             title="Must include"
             items={must}
             icon={
-              <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-success-subtle text-success-text">
+              <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-none bg-success-subtle text-success-text">
                 <Check className="size-3" aria-label="Required" />
               </span>
             }
@@ -334,7 +334,7 @@ function CreativeBrief({ item }: { item: CreatorItem }) {
             title="Avoid"
             items={b.prohibited}
             icon={
-              <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-destructive-subtle text-destructive-text">
+              <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-none bg-destructive-subtle text-destructive-text">
                 <Ban className="size-2.5" aria-label="Not allowed" />
               </span>
             }
@@ -352,7 +352,7 @@ function CreativeBrief({ item }: { item: CreatorItem }) {
         <div>
           <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
             <Lightbulb className="size-3.5" />
-            Hook ideas · optional, use your own if you prefer
+            Hook ideas · optional, use your own angle if you prefer
           </div>
           <ul className="mt-1.5 flex flex-wrap gap-1.5">
             {b.hooks.map((h) => (
@@ -437,7 +437,7 @@ const CREATOR_FACTOR_LABEL: Record<string, string> = {
 function WhyYou({ item }: { item: CreatorItem }) {
   const match = matchFor(item);
   if (!match) return null;
-  // Cost efficiency is priced for the brand (incl. platform fee), so it isn't shown to creators.
+  // Cost efficiency is priced for the brand (incl. Klynt fee), so it isn't shown to creators.
   const factors = match.factors.filter((f) => f.key !== "efficiency");
   return (
     <section className="surface p-4 sm:p-5" aria-labelledby="why-h">
@@ -458,8 +458,8 @@ function WhyYou({ item }: { item: CreatorItem }) {
               <span className="font-medium">{CREATOR_FACTOR_LABEL[f.key] ?? f.label}</span>
               <span className="text-muted-foreground tabular-nums">{f.score}/100</span>
             </div>
-            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted" aria-hidden>
-              <div className={cn("h-full rounded-full", factorBarTone(f.score))} style={{ width: `${f.score}%` }} />
+            <div className="mt-1 h-1.5 overflow-hidden rounded-none bg-muted" aria-hidden>
+              <div className={cn("h-full rounded-none", factorBarTone(f.score))} style={{ width: `${f.score}%` }} />
             </div>
             <p className="mt-1 text-xs text-muted-foreground">{f.detail}</p>
           </div>

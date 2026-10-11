@@ -12,13 +12,12 @@ import { ChipToggle, Tag } from "@/components/chip";
 import { PLATFORMS, PLATFORM_ORDER, PlatformIcon } from "@/components/platform-icon";
 import { COUNTRY_FLAGS, COUNTRY_NAMES, compact, usd } from "@/lib/domain/format";
 import { NICHES, NICHE_LABEL } from "@/lib/domain/labels";
-import { matchSet } from "@/lib/domain/matching";
+import { PLATFORM_FEE_RATE, matchSet } from "@/lib/domain/matching";
 import type { Campaign, CreatorSet, NicheId, Platform } from "@/lib/domain/types";
 import { CREATORS } from "@/lib/domain/creators";
 import { matchCreator } from "@/lib/domain/matching";
-import { SelectableCard } from "@/components/selectable-card";
 import { CreatorPhoto } from "@/components/app/creator-photo";
-import { Bot, Hand, UserMinus } from "lucide-react";
+import { Timer, UserMinus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FieldLabel, FormSection, Helper, MoneyInput } from "./form-section";
 import { INTEREST_SUGGESTIONS } from "./editor-state";
@@ -44,7 +43,7 @@ export function SetForm({ set, onChange, campaign, budget }: { set: CreatorSet; 
             </div>
             <div>
               <FieldLabel htmlFor="shyp" hint="Optional">What are you testing?</FieldLabel>
-              <Input id="shyp" className="h-9" value={set.hypothesis} onChange={(e) => onChange({ hypothesis: e.target.value })} placeholder="e.g. Students respond to budget framing" />
+              <Input id="shyp" className="h-9" value={set.hypothesis} onChange={(e) => onChange({ hypothesis: e.target.value })} placeholder="e.g. ML engineers respond to benchmark-led demos" />
             </div>
           </div>
         </FormSection>
@@ -67,7 +66,6 @@ export function SetForm({ set, onChange, campaign, budget }: { set: CreatorSet; 
               >
                 <PlatformIcon platform={p} className="size-5" />
                 <span className="flex-1">{PLATFORMS[p].label}</span>
-                {p === "youtube" && <span className="text-[10px] font-normal text-muted-foreground">Beta</span>}
                 {on && <Check className="size-4 text-primary" />}
               </button>
             );
@@ -75,7 +73,7 @@ export function SetForm({ set, onChange, campaign, budget }: { set: CreatorSet; 
         </div>
       </FormSection>
 
-      <FormSection title="Target audience" description="Who should see the content. Organic reach follows each creator's real audience, so this guides selection rather than controlling delivery.">
+      <FormSection title="Target audience" description="The professional audience you want to reach. Organic reach follows each creator's real audience, so this guides selection rather than controlling delivery.">
         <div className="space-y-5">
           <div>
             <FieldLabel>Audience location</FieldLabel>
@@ -123,7 +121,7 @@ export function SetForm({ set, onChange, campaign, budget }: { set: CreatorSet; 
         </div>
       </FormSection>
 
-      <FormSection title="Creators" description="Creator niche is what they make. Audience interests are what their viewers care about.">
+      <FormSection title="Creators" description="Creator niche is their area of expertise. Audience interests are what their viewers work on and care about.">
         <div className="space-y-5">
           <div>
             <FieldLabel>Creator niche</FieldLabel>
@@ -141,7 +139,7 @@ export function SetForm({ set, onChange, campaign, budget }: { set: CreatorSet; 
                 <Switch checked={set.creatorGeo.required} onCheckedChange={(v) => onChange({ creatorGeo: { ...set.creatorGeo, required: v } })} disabled={!set.creatorGeo.countries.length} />
                 Required (otherwise a preference)
               </label>
-              <Helper>Separate from audience location: e.g. creators must live in the US to receive product shipments.</Helper>
+              <Helper>Separate from audience location: e.g. creators must be based in the US for contract or compliance reasons.</Helper>
             </div>
           )}
         </div>
@@ -177,7 +175,7 @@ export function SetForm({ set, onChange, campaign, budget }: { set: CreatorSet; 
                   <Input className="h-9 w-32" inputMode="numeric" value={set.qualification.followerRange[1]} onChange={(e) => onChange({ qualification: { ...set.qualification, followerRange: [set.qualification.followerRange![0], Number(e.target.value.replace(/\D/g, "")) || 0] } })} aria-label="Maximum followers" />
                 </div>
               )}
-              <Helper>Optional. Follower count alone doesn&apos;t predict views.</Helper>
+              <Helper>Optional. Follower count alone doesn&apos;t predict views or audience fit.</Helper>
             </div>
             {!simple && (
               <div className="grid gap-5 sm:grid-cols-2">
@@ -289,7 +287,7 @@ function InterestInput({ value, onChange, suggestions }: { value: string[]; onCh
             } else if (e.key === "Backspace" && !text && value.length) onChange(value.slice(0, -1));
           }}
           onBlur={() => add(text)}
-          placeholder={value.length ? "" : "e.g. University students, running, protein snacks"}
+          placeholder={value.length ? "" : "e.g. LLM evaluation, Kubernetes, zero-trust security"}
           className="min-w-40 flex-1 bg-transparent px-1 text-sm outline-none"
           aria-label="Audience interests"
         />
@@ -307,41 +305,34 @@ function InterestInput({ value, onChange, suggestions }: { value: string[]; onCh
 
 function SelectionSection({ set, onChange, campaign }: { set: CreatorSet; onChange: (p: Partial<CreatorSet>) => void; campaign: Campaign }) {
   const [q, setQ] = useState("");
+  const pool = matchSet(set, campaign);
+  const priced = { eligible: pool.matches.length, rateLimited: pool.excluded.filter((m) => m.exclusions.length === 1 && m.exclusions[0].startsWith("Usually charges")).length };
   const results = q.trim()
     ? CREATORS.filter((c) => `${c.name} ${c.handle}`.toLowerCase().includes(q.toLowerCase()) && !set.includeCreators.includes(c.id)).slice(0, 6)
     : [];
   return (
-    <FormSection title="Creator selection" description="How creators get onto this set's roster.">
-      <div className="grid gap-3 sm:grid-cols-2">
-        <SelectableCard selected={set.selection === "automatic"} onSelect={() => onChange({ selection: "automatic" })}>
-          <span className="flex items-center gap-2 font-medium">
-            <Bot className="size-4 text-primary" /> Automatic <span className="rounded bg-brand-subtle px-1.5 py-0.5 text-[10px] font-semibold text-brand-subtle-foreground">Recommended</span>
-          </span>
-          <span className="pr-5 text-sm text-muted-foreground">We pick and invite the best-fit creators within your rules and budget, and replace anyone who declines. You can exclude creators anytime before they accept.</span>
-        </SelectableCard>
-        <SelectableCard selected={set.selection === "manual"} onSelect={() => onChange({ selection: "manual" })}>
-          <span className="flex items-center gap-2 font-medium">
-            <Hand className="size-4 text-muted-foreground" /> Manual review
-          </span>
-          <span className="pr-5 text-sm text-muted-foreground">We recommend creators after you publish; you approve each one before their fixed-fee offer is sent.</span>
-        </SelectableCard>
+    <FormSection title="Creators" description="Our matching engine scores creators for this set from their connected-account data.">
+      <div className="flex items-start gap-3 rounded-xl bg-muted/50 p-3.5 text-sm">
+        <Timer className="mt-0.5 size-4 shrink-0 text-primary" />
+        <p>
+          <span className="font-medium">Matches pair automatically after 24 hours.</span>{" "}
+          <span className="text-muted-foreground">Review their profile and audience data in the meantime and decline anyone who isn&apos;t right. We&apos;ll match a comparable replacement.</span>
+        </p>
       </div>
 
       <div className="mt-5 grid gap-5 sm:grid-cols-2">
         <div>
-          <label className="flex items-center gap-2 text-sm font-medium">
-            <Switch checked={!!set.maxFee} onCheckedChange={(v) => onChange({ maxFee: v ? 400 : undefined })} />
-            Cap the fee per creator
-          </label>
-          {set.maxFee ? (
-            <div className="mt-2 max-w-48">
-              <MoneyInput value={set.maxFee} onChange={(v) => onChange({ maxFee: v || undefined })} />
-            </div>
-          ) : null}
-          <Helper>Creators whose fixed fee is above the cap are never invited.</Helper>
+          <FieldLabel hint={`+ ${usd(Math.round(set.price * PLATFORM_FEE_RATE))} Klynt fee (1%)`}>Price per creator</FieldLabel>
+          <div className="max-w-48">
+            <MoneyInput value={set.price} onChange={(v) => onChange({ price: v })} />
+          </div>
+          <Helper>
+            Every creator in this set is offered this fixed fee for the brief&apos;s posts. You set it; Klynt adds 1%.{" "}
+            {priced.eligible} creators qualify at this price{priced.rateLimited ? `; ${priced.rateLimited} more usually charge above it` : ""}.
+          </Helper>
         </div>
         <div>
-          <FieldLabel hint="Invited first if they qualify">Include specific creators</FieldLabel>
+          <FieldLabel hint="Matched first if they qualify">Include specific creators</FieldLabel>
           <div className="relative">
             <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name or @handle" className="h-9 w-full rounded-lg border border-input bg-transparent pr-3 pl-8 text-sm outline-none focus:border-ring focus:ring-3 focus:ring-ring/50" />

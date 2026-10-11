@@ -44,9 +44,9 @@ export function CreatorShell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-dvh flex-col bg-canvas">
       <header className="sticky top-0 z-30 border-b bg-canvas/85 backdrop-blur-md">
         <div className="mx-auto flex h-14 w-full max-w-5xl items-center gap-2 px-4 sm:px-6">
-          <Link href="/creator" className="flex items-center gap-2 rounded-lg font-semibold tracking-tight outline-none focus-visible:ring-3 focus-visible:ring-ring/50" aria-label="Creator Connect inbox">
+          <Link href="/creator" className="flex items-center gap-2 rounded-lg font-semibold tracking-tight outline-none focus-visible:ring-3 focus-visible:ring-ring/50" aria-label="Klynt inbox">
             <LogoMark />
-            <span className="hidden text-[15px] lg:inline">Creator Connect</span>
+            <span className="hidden text-[15px] lg:inline">Klynt</span>
           </Link>
           <Suspense fallback={<div className="hidden flex-1 md:block" />}>
             <DesktopNav />
@@ -127,11 +127,11 @@ function BottomTabs() {
                   active && "text-foreground"
                 )}
               >
-                {active && <span className="absolute inset-x-8 top-0 h-0.5 rounded-full bg-primary" />}
+                {active && <span className="absolute inset-x-8 top-0 h-0.5 rounded-none bg-primary" />}
                 <span className="relative">
                   <Icon className={cn("size-[22px]", active && "text-primary")} strokeWidth={active ? 2.2 : 1.8} />
                   {count > 0 && (
-                    <span className="absolute -top-1.5 -right-2.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground tabular-nums ring-2 ring-card">
+                    <span className="absolute -top-1.5 -right-2.5 flex h-4 min-w-4 items-center justify-center rounded-none bg-primary px-1 text-[10px] font-semibold text-primary-foreground tabular-nums ring-2 ring-card">
                       {count}
                     </span>
                   )}
@@ -180,7 +180,7 @@ function CreatorSwitcher() {
         <button
           type="button"
           aria-label={`Viewing as ${creator.name}. Switch creator`}
-          className="flex h-9 items-center gap-2 rounded-full border bg-card py-1 pr-2 pl-1 text-left shadow-card transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="flex h-9 items-center gap-2 rounded-none border bg-card py-1 pr-2 pl-1 text-left shadow-card transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
         >
           <CreatorPhoto creator={creator} size={26} />
           <span className="min-w-0 leading-tight">

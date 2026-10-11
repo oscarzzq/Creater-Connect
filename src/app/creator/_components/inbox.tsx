@@ -49,7 +49,7 @@ export function Inbox() {
           {d.todo > 0 && (
             <>
               {" · "}
-              <Link href="/creator/work" className="rounded font-medium text-foreground underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50">
+              <Link href="/creator/work" className="rounded-none font-medium text-foreground underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50">
                 {d.todo} {d.todo === 1 ? "thing" : "things"} to do in Work
               </Link>
             </>
@@ -69,7 +69,7 @@ export function Inbox() {
               <TabsTrigger key={t.key} value={t.key} className="px-1 text-[13px] sm:px-3">
                 {t.label}
                 {n > 0 && (
-                  <span className={cn("rounded px-1 text-[11px] font-semibold tabular-nums", t.key === "new" ? "bg-primary text-primary-foreground" : "text-muted-foreground")}>{n}</span>
+                  <span className={cn("rounded-none px-1 text-[11px] font-semibold tabular-nums", t.key === "new" ? "bg-primary text-primary-foreground" : "text-muted-foreground")}>{n}</span>
                 )}
               </TabsTrigger>
             );
@@ -87,7 +87,7 @@ export function Inbox() {
             <EmptyState
               icon={InboxIcon}
               title="You're all caught up"
-              description="New offers land here the moment a brand matches with you. Keep your connected accounts and profile current to show up in more campaigns."
+              description="Sponsorship offers from businesses relevant to your expertise and audience land here as soon as you're matched to a campaign. Keep your profile and connected accounts current to be matched more often."
               action={
                 <Button asChild variant="outline">
                   <Link href="/creator/onboarding">

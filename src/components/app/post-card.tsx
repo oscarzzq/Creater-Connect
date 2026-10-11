@@ -31,7 +31,7 @@ const LABEL: Record<Post["status"], string> = {
   verified: "Live",
 };
 
-/** 9:16 post tile. Views appear only for published posts; nothing is estimated here. */
+/** Portrait post tile (mobile view of the post). Views appear only for published posts; nothing is estimated here. */
 export function PostCard({ post, onOpen, subtitle, className, size = "md" }: { post: Post; onOpen?: () => void; subtitle?: string; className?: string; size?: "sm" | "md" }) {
   const creator = creatorById(post.creatorId);
   const started = post.status !== "not_started";
@@ -56,7 +56,7 @@ export function PostCard({ post, onOpen, subtitle, className, size = "md" }: { p
         </div>
         {started ? (
           <span className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
-            <span className="flex size-10 items-center justify-center rounded-full bg-white/90 text-black shadow-lg">
+            <span className="flex size-10 items-center justify-center rounded-none bg-white/90 text-black shadow-lg">
               <Play className="ml-0.5 size-4 fill-current" />
             </span>
           </span>

@@ -26,7 +26,7 @@ export function BriefTab({ campaign }: DetailProps) {
         </Section>
         <Section title="Creative requirements">
           <dl className="grid gap-3 text-sm sm:grid-cols-3">
-            <Def k="Format" v={`${b.deliverables} × ${b.format === "short_video" ? "short-form video" : b.format}`} />
+            <Def k="Format" v={`${b.deliverables} × ${b.format === "video" ? "video" : b.format === "post" ? "written post" : "carousel / document"}`} />
             <Def k="Length" v={b.videoLength} />
             <Def k="Tone" v={b.tone} />
           </dl>
@@ -69,7 +69,7 @@ export function BriefTab({ campaign }: DetailProps) {
           </dl>
         </Section>
         <Section title="Fulfillment">
-          <p className="text-sm">{b.fulfillment.kind === "none" ? "No product needed." : b.fulfillment.details}</p>
+          <p className="text-sm">{b.fulfillment.kind === "none" ? "No product access needed." : b.fulfillment.details}</p>
           {b.fulfillment.expectedBy && <p className="mt-1 text-xs text-muted-foreground">Expected by {shortDate(b.fulfillment.expectedBy)}</p>}
         </Section>
         <Button variant="outline" className="w-full" onClick={() => toast("Brief edits apply to creators who haven't accepted yet (demo)")}>

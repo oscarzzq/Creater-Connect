@@ -1,5 +1,5 @@
-// Curated Unsplash photos used as creator portraits and content thumbnails.
-// Every id was verified to exist; keys describe what the photo shows.
+// Curated Unsplash photos used as creator portraits, campaign images and content thumbnails.
+// Every id was verified to exist. Content shots are people- and logo-free.
 
 export const IMAGES = {
   // Portraits
@@ -30,44 +30,39 @@ export const IMAGES = {
   "p-coco": "1515886657613-9f3515b0c78f",
   "p-skylar": "1594381898411-846e7d193883",
 
-  // Beauty / skincare content
-  "c-serum-hands": "1515377905703-c4788e51af15",
-  "c-serum-roller": "1600428877878-1a0fd85beda8",
-  "c-serum-shadow": "1608571423902-eed4a5ad8108",
-  "c-serum-eucalyptus": "1617897903246-719242758050",
-  "c-serum-white": "1576426863848-c21f53c60b19",
-  "c-serum-stones": "1612817288484-6f916006741a",
-  "c-serum-blue": "1540555700478-4be289fbecef",
-  "c-tube": "1620916566398-39f1143ab7be",
-  "c-flatlay": "1598440947619-2c35fc9aa908",
-  "c-brushes": "1596462502278-27bfdc403348",
-  "c-facial": "1570172619644-dfd03ed5d881",
-  "c-mask": "1616394584738-fc6e612e71b9",
-  "c-treatment": "1552693673-1bf958298935",
-  "c-bottles": "1631729371254-42c2892f0e6e",
-  "c-jars": "1611930022073-b7a4ba5fcccd",
-  "c-pump": "1540555700478-4be289fbecef",
-  "c-amber": "1528740561666-dc2479dc08ab",
-  "c-soaps": "1607006344380-b6775a0824a7",
-
-  // Food / fitness / lifestyle content
-  "c-protein-bars": "1622484212850-eb596d769edc",
-  "c-bowl": "1490645935967-10de6ba17061",
-  "c-steak-salad": "1504674900247-0877df9cc836",
-  "c-salad": "1512621776951-a57141f2eefd",
-  "c-avocado-toast": "1541519227354-08fa5d50c44d",
-  "c-coffee": "1495474472287-4d71bcdd2085",
-  "c-deadlift": "1517836357463-d25dfeac3438",
-  "c-crunches": "1571019613454-1cb2f99b2d8b",
-  "c-gym": "1534438327276-14e5300c3a48",
-  "c-workout": "1594381898411-846e7d193883",
-  "c-tracksuit": "1515886657613-9f3515b0c78f",
-  "c-beach": "1507525428034-b723cf961d3e",
-  "c-mountains": "1469474968028-56623f02e42e",
-  "c-desk": "1499951360447-b19be8fe80f5",
-  "c-workspace": "1519389950473-47ba0277781c",
-  "c-phone": "1526045612212-70caf35c14df",
-  "c-earbuds": "1610438235354-a6ae5528385c",
+  // Technical / B2B content (people- and logo-free)
+  "t-dashboard": "1460925895917-afdab827c52f",
+  "t-code-dark": "1461749280684-dccba630e2f6",
+  "t-mic": "1478737270239-2f02b77fc618",
+  "t-laptop-code": "1484417894907-623942c8ee29",
+  "t-code-screen": "1488590528505-98d2b5aba04b",
+  "t-desk-code": "1498050108023-c5249f4df085",
+  "t-analytics": "1504868584819-f8e8b4b6d7e3",
+  "t-python": "1515879218367-8466d910aaa4",
+  "t-keyboard-red": "1517433456452-f9633a875f6f",
+  "t-laptop-plant": "1517694712202-14dd9538aa97",
+  "t-circuit": "1518770660439-4636190af475",
+  "t-laptop-glow": "1525547719571-a2d4ac8945e2",
+  "t-matrix": "1526374965328-7f61d4dc18c5",
+  "t-laptop-dark": "1531297484001-80022131f5a1",
+  "t-html": "1542831371-29b0f74f9713",
+  "t-network": "1544197150-b99a580bb7a8",
+  "t-security": "1550751827-4bd374c3f58b",
+  "t-charts": "1551288049-bebda4e38f71",
+  "t-editor": "1555066931-4365d14bab8c",
+  "t-servers": "1558494949-ef010cbdcc31",
+  "t-ide": "1587620962725-abab7fe55159",
+  "t-studio": "1589903308904-1010c2294adc",
+  "t-trading": "1590283603385-17ffb3a7f29f",
+  "t-workspace": "1593642632559-0c6d3fc62b89",
+  "t-drive": "1597852074816-d933c7d2b988",
+  "t-code-blue": "1607799279861-4dd421887fb3",
+  "t-candles": "1611974789855-9c2a0a7236a3",
+  "t-lock": "1614064641938-3bbee52942c7",
+  "t-robot": "1620712943543-bcc4688e7485",
+  "t-terminal": "1629654297299-c8506221ca97",
+  "t-blocks": "1639322537228-f710d846310a",
+  "t-ai": "1677442136019-21780ecad995",
 } as const;
 
 export type ImageKey = keyof typeof IMAGES;

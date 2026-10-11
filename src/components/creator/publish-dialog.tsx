@@ -44,7 +44,7 @@ function PublishForm({ post, campaign, onDone }: { post: Post; campaign: Campaig
 
   const steps = [
     `Post it on ${platform} from ${handle ?? "your own account"} as a normal organic post${post.dueAt ? ` by ${shortDate(post.dueAt)}` : ""}.`,
-    "Turn on the platform's paid-partnership label (or add #ad).",
+    "Disclose the partnership: turn on the platform's paid-partnership label (or add #ad).",
     "Don't boost or promote it. Only organic views count.",
     campaign.guarantee && `Keep it up for at least ${campaign.guarantee.windowDays} days while views are measured.`,
   ].filter((s): s is string => !!s);
@@ -64,7 +64,7 @@ function PublishForm({ post, campaign, onDone }: { post: Post; campaign: Campaig
       <ol className="space-y-2 text-sm">
         {steps.map((s, i) => (
           <li key={s} className="flex gap-2.5">
-            <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-semibold tabular-nums">{i + 1}</span>
+            <span className="flex size-5 shrink-0 items-center justify-center rounded-none bg-muted text-[11px] font-semibold tabular-nums">{i + 1}</span>
             <span className="text-foreground/85">{s}</span>
           </li>
         ))}

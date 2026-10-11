@@ -1,7 +1,27 @@
-import { Photo } from "./photo";
 import { cn } from "@/lib/utils";
 import type { Creator } from "@/lib/domain/types";
 
+// Tinted tiles, not portraits: the demo shows no faces. Each pair is AA (≥4.5:1).
+const TONES = [
+  "bg-brand-subtle text-brand-subtle-foreground",
+  "bg-success-subtle text-success-text",
+  "bg-warning-subtle text-warning-text",
+  "bg-destructive-subtle text-destructive-text",
+  "bg-muted text-foreground",
+];
+
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/);
+  return ((parts[0]?.[0] ?? "") + (parts.length > 1 ? parts[parts.length - 1][0] : "")).toUpperCase();
+}
+
+function toneFor(name: string) {
+  let h = 0;
+  for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return TONES[h % TONES.length];
+}
+
+/** Creator avatar: square initials tile, colour stable per name. */
 export function CreatorPhoto({
   creator,
   size = 32,
@@ -15,10 +35,17 @@ export function CreatorPhoto({
 }) {
   return (
     <span
-      className={cn("relative inline-block shrink-0 overflow-hidden rounded-full bg-muted", ring && "ring-2 ring-card", className)}
-      style={{ width: size, height: size }}
+      role="img"
+      aria-label={creator.name}
+      className={cn(
+        "relative inline-flex shrink-0 items-center justify-center font-semibold select-none",
+        toneFor(creator.name),
+        ring && "ring-2 ring-card",
+        className
+      )}
+      style={{ width: size, height: size, fontSize: Math.max(9, Math.round(size * 0.38)) }}
     >
-      <Photo src={creator.photo} alt={creator.name} faces sizes={`${size * 2}px`} />
+      {initials(creator.name)}
     </span>
   );
 }
@@ -41,7 +68,7 @@ export function CreatorStack({
       ))}
       {extra > 0 && (
         <span
-          className="relative inline-flex items-center justify-center rounded-full bg-muted text-[10px] font-medium text-muted-foreground ring-2 ring-card tabular-nums"
+          className="relative inline-flex items-center justify-center rounded-none bg-muted text-[10px] font-medium text-muted-foreground ring-2 ring-card tabular-nums"
           style={{ width: size, height: size }}
         >
           +{extra}
