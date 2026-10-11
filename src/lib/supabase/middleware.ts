@@ -12,9 +12,11 @@ function getAnonKey() {
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    getAnonKey(),
+  // Without Supabase env vars the app runs in demo mode; don't take every route down.
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = getAnonKey();
+  if (!url || !key) return supabaseResponse;
+  const supabase = createServerClient(url, key,
     {
       cookies: {
         getAll() {
@@ -34,7 +36,11 @@ export async function updateSession(request: NextRequest) {
   );
 
   // Refresh session if expired — required for Server Components
-  await supabase.auth.getUser();
+  try {
+    await supabase.auth.getUser();
+  } catch {
+    // Supabase unreachable: continue signed out rather than failing the request.
+  }
 
   return supabaseResponse;
 }
