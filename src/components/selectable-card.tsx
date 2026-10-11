@@ -54,7 +54,7 @@ export function SelectionIndicator({
       aria-hidden
       className={cn(
         "flex size-4 shrink-0 items-center justify-center border transition-colors",
-        type === "radio" ? "rounded-full" : "rounded-[5px]",
+        type === "radio" ? "rounded-full" : "rounded-none",
         selected ? "border-primary bg-primary text-primary-foreground" : "border-input bg-background",
         className
       )}

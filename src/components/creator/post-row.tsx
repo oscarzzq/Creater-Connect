@@ -136,7 +136,7 @@ export function PostRow({
                 <PlatformIcon platform={post.platform} className="size-3.5" />
                 {what}
               </span>
-              {post.version > 1 && <span className="rounded border px-1 text-[10px] font-medium text-muted-foreground tabular-nums">v{post.version}</span>}
+              {post.version > 1 && <span className="rounded-none border px-1 text-[10px] font-medium text-muted-foreground tabular-nums">v{post.version}</span>}
               <StatusPill tone={status.tone}>{status.label}</StatusPill>
             </div>
             <div className={cn("mt-1 text-xs text-muted-foreground", overdue && "font-medium text-destructive-text")}>{meta}</div>
@@ -207,7 +207,7 @@ function Metric({ icon: Icon, value, label }: { icon: React.ComponentType<{ clas
 
 function PostLink({ url }: { url: string }) {
   return (
-    <a href={url} target="_blank" rel="noreferrer noopener" className="ml-auto inline-flex items-center gap-1 rounded font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50">
+    <a href={url} target="_blank" rel="noreferrer noopener" className="ml-auto inline-flex items-center gap-1 rounded-none font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50">
       View post
       <ExternalLink className="size-3" />
       <span className="sr-only">(opens in a new tab)</span>

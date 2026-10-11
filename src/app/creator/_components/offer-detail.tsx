@@ -147,7 +147,7 @@ export function OfferDetail({ params }: { params: Promise<{ id: string }> }) {
                 <h2 id="progress-h" className="text-sm font-semibold">
                   Your progress
                 </h2>
-                <Link href="/creator/work" className="rounded text-xs font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50">
+                <Link href="/creator/work" className="rounded-none text-xs font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50">
                   All work
                 </Link>
               </div>
@@ -323,7 +323,7 @@ function CreativeBrief({ item }: { item: CreatorItem }) {
             title="Must include"
             items={must}
             icon={
-              <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-success-subtle text-success-text">
+              <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-none bg-success-subtle text-success-text">
                 <Check className="size-3" aria-label="Required" />
               </span>
             }
@@ -334,7 +334,7 @@ function CreativeBrief({ item }: { item: CreatorItem }) {
             title="Avoid"
             items={b.prohibited}
             icon={
-              <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-destructive-subtle text-destructive-text">
+              <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-none bg-destructive-subtle text-destructive-text">
                 <Ban className="size-2.5" aria-label="Not allowed" />
               </span>
             }
@@ -458,8 +458,8 @@ function WhyYou({ item }: { item: CreatorItem }) {
               <span className="font-medium">{CREATOR_FACTOR_LABEL[f.key] ?? f.label}</span>
               <span className="text-muted-foreground tabular-nums">{f.score}/100</span>
             </div>
-            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted" aria-hidden>
-              <div className={cn("h-full rounded-full", factorBarTone(f.score))} style={{ width: `${f.score}%` }} />
+            <div className="mt-1 h-1.5 overflow-hidden rounded-none bg-muted" aria-hidden>
+              <div className={cn("h-full rounded-none", factorBarTone(f.score))} style={{ width: `${f.score}%` }} />
             </div>
             <p className="mt-1 text-xs text-muted-foreground">{f.detail}</p>
           </div>

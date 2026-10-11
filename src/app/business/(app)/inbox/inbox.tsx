@@ -141,10 +141,10 @@ export function Inbox() {
             return (
               <li key={i.id}>
                 <button onClick={() => select(i)} className={cn("flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/40", selected?.id === i.id && "bg-brand-subtle/50")}>
-                  <span className="relative mt-0.5 shrink-0">
-                    {creator ? <CreatorPhoto creator={creator} size={32} /> : <span className={cn("flex size-8 items-center justify-center rounded-full", K.tone)}><K.icon className="size-4" /></span>}
+                  <span className="relative mt-0.5 flex shrink-0">
+                    {creator ? <CreatorPhoto creator={creator} size={32} /> : <span className={cn("flex size-8 items-center justify-center rounded-none", K.tone)}><K.icon className="size-4" /></span>}
                     {creator && (
-                      <span className={cn("absolute -right-1 -bottom-1 flex size-4 items-center justify-center rounded-md ring-2 ring-card", K.tone)}>
+                      <span className={cn("absolute -right-1.5 -bottom-1.5 flex size-4 items-center justify-center rounded-md ring-2 ring-card", K.tone)}>
                         <K.icon className="size-2.5" />
                       </span>
                     )}
@@ -155,7 +155,7 @@ export function Inbox() {
                       {!isRead && <span className="size-1.5 shrink-0 rounded-full bg-primary" aria-label="Unread" />}
                     </span>
                     <span className="block truncate text-xs text-muted-foreground">{i.body}</span>
-                    {i.needsAction && <span className="mt-1 inline-block rounded bg-warning-subtle px-1.5 text-[10px] font-medium text-warning-text">Needs action</span>}
+                    {i.needsAction && <span className="mt-1 inline-block rounded-none bg-warning-subtle px-1.5 text-[10px] font-medium text-warning-text">Needs action</span>}
                   </span>
                   <span className="shrink-0 text-[11px] text-muted-foreground">{relative(i.at)}</span>
                 </button>

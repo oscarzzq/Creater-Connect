@@ -49,7 +49,7 @@ export function Inbox() {
           {d.todo > 0 && (
             <>
               {" · "}
-              <Link href="/creator/work" className="rounded font-medium text-foreground underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50">
+              <Link href="/creator/work" className="rounded-none font-medium text-foreground underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50">
                 {d.todo} {d.todo === 1 ? "thing" : "things"} to do in Work
               </Link>
             </>
@@ -69,7 +69,7 @@ export function Inbox() {
               <TabsTrigger key={t.key} value={t.key} className="px-1 text-[13px] sm:px-3">
                 {t.label}
                 {n > 0 && (
-                  <span className={cn("rounded px-1 text-[11px] font-semibold tabular-nums", t.key === "new" ? "bg-primary text-primary-foreground" : "text-muted-foreground")}>{n}</span>
+                  <span className={cn("rounded-none px-1 text-[11px] font-semibold tabular-nums", t.key === "new" ? "bg-primary text-primary-foreground" : "text-muted-foreground")}>{n}</span>
                 )}
               </TabsTrigger>
             );

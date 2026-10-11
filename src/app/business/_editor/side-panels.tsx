@@ -67,8 +67,8 @@ export function CampaignPanel({ campaign, sets, budgets, live }: { campaign: Cam
                 <span className="truncate font-medium">{x.s.name}</span>
                 <span className="shrink-0 text-muted-foreground tabular-nums">{usd(x.fees)} / {usd(budgets[x.s.id])}</span>
               </div>
-              <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
-                <div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, (x.fees / Math.max(1, budgets[x.s.id])) * 100)}%` }} />
+              <div className="mt-1 h-1.5 overflow-hidden rounded-none bg-muted">
+                <div className="h-full rounded-none bg-primary" style={{ width: `${Math.min(100, (x.fees / Math.max(1, budgets[x.s.id])) * 100)}%` }} />
               </div>
             </li>
           ))}
@@ -90,7 +90,7 @@ export function SetPanel({ campaign, set, budget, live }: { campaign: Campaign; 
         <div className="text-xs text-muted-foreground">{["Your creator pool is very specific.", "Your creator pool is well defined.", "Your creator pool is broad."][breadth]}</div>
         <div className="mt-3 grid grid-cols-3 gap-1">
           {[0, 1, 2].map((i) => (
-            <span key={i} className={cn("h-1.5 rounded-full", i === breadth ? ["bg-warning", "bg-success", "bg-primary"][i] : "bg-muted")} />
+            <span key={i} className={cn("h-1.5 rounded-none", i === breadth ? ["bg-warning", "bg-success", "bg-primary"][i] : "bg-muted")} />
           ))}
         </div>
         <div className="mt-1 flex justify-between text-[11px] text-muted-foreground">
@@ -163,7 +163,7 @@ export function AdPanel({ campaign, set }: { campaign: Campaign; set: CreatorSet
             </div>
             <div className="rounded-md bg-white/90 py-1 text-center text-[11px] font-semibold text-black">{CTAS[b.cta.type]}</div>
           </div>
-          <span className="absolute top-3 left-3 rounded bg-black/50 px-1.5 py-0.5 text-[9px] font-medium text-white">Sponsored · {campaign.businessName}</span>
+          <span className="absolute top-3 left-3 rounded-none bg-black/50 px-1.5 py-0.5 text-[9px] font-medium text-white">Sponsored · {campaign.businessName}</span>
         </div>
       </div>
       <p className="text-center text-[11px] text-muted-foreground">Illustrative. Each creator films their own version in their voice.</p>

@@ -54,7 +54,7 @@ export function OfferActions({
           <MessageCircleQuestion />
           <span className={cn(!stacked && "max-[400px]:sr-only")}>Ask</span>
           {item.activation.messages.length > 0 && (
-            <span className="rounded bg-muted px-1 text-[11px] font-semibold text-muted-foreground tabular-nums">{item.activation.messages.length}</span>
+            <span className="rounded-none bg-muted px-1 text-[11px] font-semibold text-muted-foreground tabular-nums">{item.activation.messages.length}</span>
           )}
         </Button>
       </div>
@@ -176,7 +176,7 @@ function DeclineForm({ item, onDone }: { item: CreatorItem; onDone: () => void }
             aria-pressed={reason === r}
             onClick={() => setReason(reason === r ? null : r)}
             className={cn(
-              "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-sm transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50",
+              "inline-flex h-8 items-center gap-1.5 rounded-none border px-3 text-sm transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50",
               reason === r && "border-foreground bg-foreground text-background hover:bg-foreground/90"
             )}
           >

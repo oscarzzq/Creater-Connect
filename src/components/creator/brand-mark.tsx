@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import type { Campaign } from "@/lib/domain/types";
 
 const SIZES = {
-  xs: "size-4 rounded text-[9px]",
+  xs: "size-4 rounded-none text-[9px]",
   sm: "size-6 rounded-md text-[11px]",
   md: "size-8 rounded-lg text-sm",
   lg: "size-11 rounded-xl text-lg",

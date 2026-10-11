@@ -75,7 +75,7 @@ function OnboardingFlow({ creator }: { creator: Creator }) {
       <ol className="flex items-center gap-1.5" aria-label="Setup progress">
         {STEPS.map((s, i) => (
           <li key={s.key} className="flex min-w-0 flex-1 flex-col gap-1.5" aria-current={i === step ? "step" : undefined}>
-            <span className={cn("h-1 rounded-full", i < step ? "bg-success" : i === step ? "bg-primary" : "bg-muted")} />
+            <span className={cn("h-1 rounded-none", i < step ? "bg-success" : i === step ? "bg-primary" : "bg-muted")} />
             <span className={cn("truncate text-[11px] font-medium", i === step ? "text-foreground" : "text-muted-foreground")}>
               {s.label}
               <span className="sr-only">{i < step ? " (done)" : i === step ? " (current)" : ""}</span>

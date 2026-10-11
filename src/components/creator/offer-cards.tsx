@@ -163,8 +163,8 @@ export function OfferRow({ item }: { item: CreatorItem }) {
         </div>
         {!closed && !item.paidAt && posts.length > 0 && (
           <div className="mt-2 flex items-center gap-2" aria-label={`${live} of ${posts.length} posts published`}>
-            <div className="h-1 flex-1 overflow-hidden rounded-full bg-muted">
-              <div className="h-full rounded-full bg-success" style={{ width: `${(live / posts.length) * 100}%` }} />
+            <div className="h-1 flex-1 overflow-hidden rounded-none bg-muted">
+              <div className="h-full rounded-none bg-success" style={{ width: `${(live / posts.length) * 100}%` }} />
             </div>
             <span className="text-[11px] text-muted-foreground tabular-nums">
               {live}/{posts.length}

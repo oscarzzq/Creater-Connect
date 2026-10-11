@@ -134,7 +134,7 @@ export function CampaignDetail({ params }: { params: Promise<{ id: string }> }) 
               <div className="font-medium tabular-nums">
                 {usd(r.spent)} spent <span className="font-normal text-muted-foreground">of {usd(campaign.budget)}</span>
               </div>
-              <div className="mt-1.5 flex h-1.5 gap-0.5 overflow-hidden rounded-full bg-muted">
+              <div className="mt-1.5 flex h-1.5 gap-0.5 overflow-hidden rounded-none bg-muted">
                 <div className="bg-chart-1" style={{ width: `${(r.spent / campaign.budget) * 100}%` }} />
                 <div className="bg-chart-1/45" style={{ width: `${((r.committed - r.spent) / campaign.budget) * 100}%` }} />
                 <div className="bg-chart-1/20" style={{ width: `${(r.reserved / campaign.budget) * 100}%` }} />
@@ -147,8 +147,8 @@ export function CampaignDetail({ params }: { params: Promise<{ id: string }> }) 
                   <div className="flex items-center gap-1.5 font-medium tabular-nums">
                     {compact(r.views)} <span className="font-normal text-muted-foreground">/ {compact(campaign.guarantee.minViews)} views</span>
                   </div>
-                  <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-muted">
-                    <div className={cn("h-full rounded-full", (r.delivery ?? 0) >= 1 ? "bg-success" : campaign.makeGood ? "bg-warning" : "bg-primary")} style={{ width: `${Math.min(100, (r.delivery ?? 0) * 100)}%` }} />
+                  <div className="mt-1.5 h-1.5 overflow-hidden rounded-none bg-muted">
+                    <div className={cn("h-full rounded-none", (r.delivery ?? 0) >= 1 ? "bg-success" : campaign.makeGood ? "bg-warning" : "bg-primary")} style={{ width: `${Math.min(100, (r.delivery ?? 0) * 100)}%` }} />
                   </div>
                   <div className="mt-1 truncate text-xs text-muted-foreground">{campaign.guarantee.windowDays}-day window · {REMEDIES[campaign.guarantee.remedy].toLowerCase()}</div>
                 </>
@@ -168,8 +168,8 @@ export function CampaignDetail({ params }: { params: Promise<{ id: string }> }) 
             </Fact>
             <Fact label="Timeline" className="col-span-2 @3xl/main:col-span-1">
               <div className="font-medium tabular-nums">{shortDate(campaign.startDate)} – {shortDate(campaign.endDate)}</div>
-              <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-muted">
-                <div className="h-full rounded-full bg-foreground/70" style={{ width: `${(campaign.status === "draft" ? 0 : elapsed) * 100}%` }} />
+              <div className="mt-1.5 h-1.5 overflow-hidden rounded-none bg-muted">
+                <div className="h-full rounded-none bg-foreground/70" style={{ width: `${(campaign.status === "draft" ? 0 : elapsed) * 100}%` }} />
               </div>
               <div className="mt-1 text-xs text-muted-foreground">{campaign.status === "completed" ? "Completed" : campaign.status === "draft" ? "Not launched" : daysLeft >= 0 ? `${daysLeft} days left` : "Measuring"}</div>
             </Fact>
@@ -180,7 +180,7 @@ export function CampaignDetail({ params }: { params: Promise<{ id: string }> }) 
               <button key={key} role="tab" aria-selected={tab === key} onClick={() => goTo(key)} className={cn("relative flex h-10 shrink-0 items-center gap-1.5 px-3 text-sm font-medium text-muted-foreground hover:text-foreground", tab === key && "text-foreground")}>
                 {label}
                 {count !== undefined && <span className={cn("rounded-md bg-muted px-1.5 text-[11px] tabular-nums", tab === key && "bg-foreground text-background")}>{count}</span>}
-                {tab === key && <span className="absolute inset-x-2 bottom-0 h-0.5 rounded-full bg-primary" />}
+                {tab === key && <span className="absolute inset-x-2 bottom-0 h-0.5 rounded-none bg-primary" />}
               </button>
             ))}
           </div>

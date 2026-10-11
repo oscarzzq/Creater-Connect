@@ -1,5 +1,6 @@
 // Curated Unsplash photos used as creator portraits and content thumbnails.
-// Every id was verified to exist; keys describe what the photo shows.
+// Every id was verified to exist. Content shots are people-free: keys that once showed
+// people (coffee, workout, facial, phone…) now point at product shots on the same theme.
 
 export const IMAGES = {
   // Portraits
@@ -31,7 +32,7 @@ export const IMAGES = {
   "p-skylar": "1594381898411-846e7d193883",
 
   // Beauty / skincare content
-  "c-serum-hands": "1515377905703-c4788e51af15",
+  "c-serum-hands": "1556228578-8c89e6adf883",
   "c-serum-roller": "1600428877878-1a0fd85beda8",
   "c-serum-shadow": "1608571423902-eed4a5ad8108",
   "c-serum-eucalyptus": "1617897903246-719242758050",
@@ -41,9 +42,9 @@ export const IMAGES = {
   "c-tube": "1620916566398-39f1143ab7be",
   "c-flatlay": "1598440947619-2c35fc9aa908",
   "c-brushes": "1596462502278-27bfdc403348",
-  "c-facial": "1570172619644-dfd03ed5d881",
-  "c-mask": "1616394584738-fc6e612e71b9",
-  "c-treatment": "1552693673-1bf958298935",
+  "c-facial": "1612817288484-6f916006741a",
+  "c-mask": "1596462502278-27bfdc403348",
+  "c-treatment": "1600428877878-1a0fd85beda8",
   "c-bottles": "1631729371254-42c2892f0e6e",
   "c-jars": "1611930022073-b7a4ba5fcccd",
   "c-pump": "1540555700478-4be289fbecef",
@@ -56,17 +57,17 @@ export const IMAGES = {
   "c-steak-salad": "1504674900247-0877df9cc836",
   "c-salad": "1512621776951-a57141f2eefd",
   "c-avocado-toast": "1541519227354-08fa5d50c44d",
-  "c-coffee": "1495474472287-4d71bcdd2085",
-  "c-deadlift": "1517836357463-d25dfeac3438",
-  "c-crunches": "1571019613454-1cb2f99b2d8b",
+  "c-coffee": "1509042239860-f550ce710b93",
+  "c-deadlift": "1638536532686-d610adfc8e5c",
+  "c-crunches": "1601925260368-ae2f83cf8b7f",
   "c-gym": "1534438327276-14e5300c3a48",
-  "c-workout": "1594381898411-846e7d193883",
-  "c-tracksuit": "1515886657613-9f3515b0c78f",
+  "c-workout": "1534438327276-14e5300c3a48",
+  "c-tracksuit": "1601925260368-ae2f83cf8b7f",
   "c-beach": "1507525428034-b723cf961d3e",
   "c-mountains": "1469474968028-56623f02e42e",
   "c-desk": "1499951360447-b19be8fe80f5",
-  "c-workspace": "1519389950473-47ba0277781c",
-  "c-phone": "1526045612212-70caf35c14df",
+  "c-workspace": "1499951360447-b19be8fe80f5",
+  "c-phone": "1499951360447-b19be8fe80f5",
   "c-earbuds": "1610438235354-a6ae5528385c",
 } as const;
 

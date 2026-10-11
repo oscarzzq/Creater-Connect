@@ -12,11 +12,12 @@ function getAnonKey() {
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
-  // Without Supabase env vars the app runs in demo mode; don't take every route down.
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = getAnonKey();
-  if (!url || !key) return supabaseResponse;
-  const supabase = createServerClient(url, key,
+  // Demo mode: no Supabase configured, nothing to refresh.
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !getAnonKey()) return supabaseResponse;
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    getAnonKey(),
     {
       cookies: {
         getAll() {
