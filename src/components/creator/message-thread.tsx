@@ -72,7 +72,7 @@ export function MessageThread({ activation, campaign, readOnly = false, classNam
                 aria-pressed={topic === t}
                 onClick={() => setTopic(topic === t ? null : t)}
                 className={cn(
-                  "inline-flex h-7 items-center rounded-full border px-2.5 text-xs transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50",
+                  "inline-flex h-7 items-center rounded-none border px-2.5 text-xs transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50",
                   topic === t && "border-primary/40 bg-brand-subtle text-brand-subtle-foreground hover:bg-brand-subtle"
                 )}
               >

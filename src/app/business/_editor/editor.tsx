@@ -339,7 +339,7 @@ function TreeItem({ depth, icon: Icon, label, sub, active, onClick, error, menu 
       {menu && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="mr-1 rounded p-1 text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-background focus-visible:opacity-100" aria-label="Creator set actions">
+            <button className="mr-1 rounded-none p-1 text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-background focus-visible:opacity-100" aria-label="Creator set actions">
               <MoreHorizontal className="size-4" />
             </button>
           </DropdownMenuTrigger>
@@ -445,7 +445,7 @@ function ObjectiveDialog({ onStart }: { onStart: (o: Objective, selection: Creat
               <div className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">Creator selection</div>
               <div className="space-y-2">
                 <SelectableCard selected={selection === "automatic"} onSelect={() => setSelection("automatic")} className="gap-1 p-3.5">
-                  <span className="flex items-center gap-1.5 text-sm font-medium"><Bot className="size-4 text-primary" />Automatic <span className="rounded bg-brand-subtle px-1.5 py-0.5 text-[10px] font-semibold text-brand-subtle-foreground">Recommended</span></span>
+                  <span className="flex items-center gap-1.5 text-sm font-medium"><Bot className="size-4 text-primary" />Automatic <span className="rounded-none bg-brand-subtle px-1.5 py-0.5 text-[10px] font-semibold text-brand-subtle-foreground">Recommended</span></span>
                   <span className="pr-5 text-xs text-muted-foreground">Set your audience, budget and max fee. We find, invite and replace creators for you.</span>
                 </SelectableCard>
                 <SelectableCard selected={selection === "manual"} onSelect={() => setSelection("manual")} className="gap-1 p-3.5">

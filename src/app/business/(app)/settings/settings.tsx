@@ -95,7 +95,7 @@ function Team() {
       <ul className="divide-y">
         {team.map(([name, email, role]) => (
           <li key={email} className="flex items-center gap-3 py-3">
-            <span className="flex size-8 items-center justify-center rounded-full bg-muted text-xs font-semibold">{name.split(" ").map((n) => n[0]).join("")}</span>
+            <span className="flex size-8 items-center justify-center rounded-none bg-muted text-xs font-semibold">{name.split(" ").map((n) => n[0]).join("")}</span>
             <span className="min-w-0 flex-1"><span className="block text-sm font-medium">{name}</span><span className="block text-xs text-muted-foreground">{email}</span></span>
             <span className="text-xs text-muted-foreground">{role}</span>
           </li>

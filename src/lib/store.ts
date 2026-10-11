@@ -13,7 +13,8 @@ import type { World } from "./domain/metrics";
 
 export type AppState = World;
 
-const KEY = "cc-store-v3";
+// Bump when seed data changes so browsers drop stale saved state (v4: people-free thumbnails)
+const KEY = "cc-store-v4";
 const SEED: AppState = {
   campaigns: SEED_CAMPAIGNS,
   sets: SEED_SETS,

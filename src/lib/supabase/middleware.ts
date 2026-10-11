@@ -12,6 +12,9 @@ function getAnonKey() {
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
+  // Demo mode: no Supabase configured, nothing to refresh.
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !getAnonKey()) return supabaseResponse;
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     getAnonKey(),

@@ -124,7 +124,7 @@ export function ActivationSheet({
             <ol className="space-y-2.5">
               {steps.map((s) => (
                 <li key={s.label} className="flex items-center gap-3 text-sm">
-                  <span className={cn("flex size-5 shrink-0 items-center justify-center rounded-full border", s.done ? "border-success bg-success text-white" : "border-dashed bg-card")}>
+                  <span className={cn("flex size-5 shrink-0 items-center justify-center rounded-none border", s.done ? "border-success bg-success text-white" : "border-dashed bg-card")}>
                     {s.done && <Check className="size-3" strokeWidth={3} />}
                   </span>
                   <span className={cn("flex-1", !s.done && "text-muted-foreground")}>{s.label}</span>

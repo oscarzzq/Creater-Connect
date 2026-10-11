@@ -315,7 +315,7 @@ function SelectionSection({ set, onChange, campaign }: { set: CreatorSet; onChan
       <div className="grid gap-3 sm:grid-cols-2">
         <SelectableCard selected={set.selection === "automatic"} onSelect={() => onChange({ selection: "automatic" })}>
           <span className="flex items-center gap-2 font-medium">
-            <Bot className="size-4 text-primary" /> Automatic <span className="rounded bg-brand-subtle px-1.5 py-0.5 text-[10px] font-semibold text-brand-subtle-foreground">Recommended</span>
+            <Bot className="size-4 text-primary" /> Automatic <span className="rounded-none bg-brand-subtle px-1.5 py-0.5 text-[10px] font-semibold text-brand-subtle-foreground">Recommended</span>
           </span>
           <span className="pr-5 text-sm text-muted-foreground">We pick and invite the best-fit creators within your rules and budget, and replace anyone who declines. You can exclude creators anytime before they accept.</span>
         </SelectableCard>

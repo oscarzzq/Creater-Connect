@@ -132,8 +132,8 @@ export function StepTracker({ steps, className }: { steps: Step[]; className?: s
   return (
     <div className={className}>
       <div className="flex items-center gap-2" aria-hidden>
-        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
-          <div className="h-full rounded-full bg-success transition-[width]" style={{ width: `${(done / steps.length) * 100}%` }} />
+        <div className="h-1.5 flex-1 overflow-hidden rounded-none bg-muted">
+          <div className="h-full rounded-none bg-success transition-[width]" style={{ width: `${(done / steps.length) * 100}%` }} />
         </div>
         <span className="text-[11px] text-muted-foreground tabular-nums">
           {done}/{steps.length}
@@ -147,7 +147,7 @@ export function StepTracker({ steps, className }: { steps: Step[]; className?: s
             )}
             <span
               className={cn(
-                "relative flex size-6 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold tabular-nums",
+                "relative flex size-6 shrink-0 items-center justify-center rounded-none text-[11px] font-semibold tabular-nums",
                 s.state === "done" && "bg-success text-white",
                 s.state === "current" && "bg-primary text-primary-foreground ring-4 ring-primary/15",
                 s.state === "waiting" && "bg-warning-subtle text-warning-text ring-1 ring-warning/40",
@@ -163,8 +163,8 @@ export function StepTracker({ steps, className }: { steps: Step[]; className?: s
                 <span className="sr-only">
                   {s.state === "done" ? " (done)" : s.state === "current" ? " (your next step)" : s.state === "waiting" ? " (in progress, nothing needed from you)" : " (upcoming)"}
                 </span>
-                {s.state === "current" && <span className="ml-2 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary uppercase">You</span>}
-                {s.state === "waiting" && <span className="ml-2 rounded bg-warning-subtle px-1.5 py-0.5 text-[10px] font-semibold text-warning-text uppercase">In progress</span>}
+                {s.state === "current" && <span className="ml-2 rounded-none bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary uppercase">You</span>}
+                {s.state === "waiting" && <span className="ml-2 rounded-none bg-warning-subtle px-1.5 py-0.5 text-[10px] font-semibold text-warning-text uppercase">In progress</span>}
               </div>
               <p className="mt-0.5 text-xs text-muted-foreground">{s.detail}</p>
             </div>

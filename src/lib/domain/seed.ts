@@ -243,13 +243,13 @@ const s1b = addSet({
 });
 
 const a1 = addActivation({ id: "act1", set: s1a, creatorId: "c1", status: "accepted", invited: "2026-09-22T10:00:00", responded: "2026-09-22T12:10:00" });
-addPosts(a1, [{ status: "verified", thumb: "p-maya", caption: "My 2-minute morning routine with @glowinc Vitamin C serum ✨ #GlowUp", due: "2026-10-10T23:59:00", submitted: "2026-09-29T18:00:00", approved: "2026-09-30T10:00:00", published: "2026-10-02T14:00:00", perf: 1.24, hook: "I tried a vitamin C serum for 14 days…" }]);
+addPosts(a1, [{ status: "verified", thumb: "c-serum-white", caption: "My 2-minute morning routine with @glowinc Vitamin C serum ✨ #GlowUp", due: "2026-10-10T23:59:00", submitted: "2026-09-29T18:00:00", approved: "2026-09-30T10:00:00", published: "2026-10-02T14:00:00", perf: 1.24, hook: "I tried a vitamin C serum for 14 days…" }]);
 const a2 = addActivation({ id: "act2", set: s1a, creatorId: "c9", status: "accepted", invited: "2026-09-22T10:00:00", responded: "2026-09-22T14:30:00" });
 addPosts(a2, [{ status: "verified", thumb: "c-serum-white", caption: "Testing @glowinc's vitamin C serum for 14 days: honest review", due: "2026-10-10T23:59:00", submitted: "2026-10-01T09:00:00", approved: "2026-10-02T11:00:00", published: "2026-10-05T17:00:00", perf: 0.96 }]);
 const a3 = addActivation({ id: "act3", set: s1a, creatorId: "c10", status: "accepted", invited: "2026-09-25T11:00:00", responded: "2026-09-25T13:05:00" });
 addPosts(a3, [{ status: "approved", thumb: "c-serum-stones", caption: "Brightening routine for melanin-rich skin ft. @glowinc", due: "2026-10-10T23:59:00", submitted: "2026-10-06T10:00:00", approved: "2026-10-07T09:30:00" }]);
 const a4 = addActivation({ id: "act4", set: s1a, creatorId: "c12", status: "accepted", invited: "2026-10-01T10:00:00", responded: "2026-10-03T09:00:00" });
-addPosts(a4, [{ status: "draft_submitted", thumb: "p-ella", caption: "POV: you finally found a serum that doesn't sting", due: "2026-10-17T23:59:00", submitted: "2026-10-07T19:00:00", hook: "The first serum that didn't sting my sensitive skin" }]);
+addPosts(a4, [{ status: "draft_submitted", thumb: "c-serum-eucalyptus", caption: "POV: you finally found a serum that doesn't sting", due: "2026-10-17T23:59:00", submitted: "2026-10-07T19:00:00", hook: "The first serum that didn't sting my sensitive skin" }]);
 addActivation({
   id: "act5", set: s1a, creatorId: "c14", status: "invited", invited: "2026-10-06T10:00:00",
   messages: [msg("m1", "creator", "Hi! Could I film this as part of my PM routine instead? My audience watches my night routines more.", "2026-10-07T21:10:00")],
@@ -258,9 +258,9 @@ addActivation({ id: "act6", set: s1a, creatorId: "c17", status: "replacement_req
 addActivation({ id: "act7", set: s1a, creatorId: "c11", status: "recommended", replacementFor: "act6" });
 
 const b1 = addActivation({ id: "act8", set: s1b, creatorId: "c15", status: "accepted", invited: "2026-09-22T10:00:00", responded: "2026-09-23T09:00:00" });
-addPosts(b1, [{ status: "published", thumb: "p-zoe", caption: "Dorm-room skincare that's actually affordable 🧴", due: "2026-10-10T23:59:00", submitted: "2026-10-04T12:00:00", approved: "2026-10-05T10:00:00", published: "2026-10-07T18:00:00", perf: 0.62, hook: "Dorm-room skincare that actually works" }]);
+addPosts(b1, [{ status: "published", thumb: "c-flatlay", caption: "Dorm-room skincare that's actually affordable 🧴", due: "2026-10-10T23:59:00", submitted: "2026-10-04T12:00:00", approved: "2026-10-05T10:00:00", published: "2026-10-07T18:00:00", perf: 0.62, hook: "Dorm-room skincare that actually works" }]);
 const b2 = addActivation({ id: "act9", set: s1b, creatorId: "c7", status: "accepted", invited: "2026-09-22T10:00:00", responded: "2026-09-23T16:20:00" });
-addPosts(b2, [{ status: "revision_requested", thumb: "p-nora", caption: "GRWM: dewy skin prep with @glowinc serum", due: "2026-10-14T23:59:00", submitted: "2026-10-03T12:00:00", version: 2, revisionNote: "Love the vibe! Please show the serum texture close-up in the first 3 seconds and say the GLOW15 code out loud." }]);
+addPosts(b2, [{ status: "revision_requested", thumb: "c-serum-roller", caption: "GRWM: dewy skin prep with @glowinc serum", due: "2026-10-14T23:59:00", submitted: "2026-10-03T12:00:00", version: 2, revisionNote: "Love the vibe! Please show the serum texture close-up in the first 3 seconds and say the GLOW15 code out loud." }]);
 const b3 = addActivation({
   id: "act10", set: s1b, creatorId: "c18", status: "accepted", invited: "2026-09-29T10:00:00", responded: "2026-09-30T08:00:00", fulfillment: "shipped",
   messages: [msg("m2", "creator", "Accepted! Shipping address is updated in my profile.", "2026-09-30T08:05:00"), msg("m3", "business", "Thanks Jess, it shipped today via USPS.", "2026-10-02T11:00:00")],
@@ -351,7 +351,7 @@ const s4 = addSet({
 });
 const h1 = addActivation({ id: "act30", set: s4, creatorId: "c16", status: "accepted", invited: "2026-09-16T10:00:00", responded: "2026-09-18T09:00:00" });
 addPosts(h1, [
-  { status: "draft_submitted", thumb: "p-mia", caption: "Unboxing the Holiday Glow Ritual Set 🎁", due: "2026-10-12T23:59:00", submitted: "2026-10-07T15:00:00", hook: "Unboxing the prettiest skincare set" },
+  { status: "draft_submitted", thumb: "c-jars", caption: "Unboxing the Holiday Glow Ritual Set 🎁", due: "2026-10-12T23:59:00", submitted: "2026-10-07T15:00:00", hook: "Unboxing the prettiest skincare set" },
   { status: "not_started", thumb: "c-flatlay", due: "2026-10-26T23:59:00" },
 ]);
 const h2 = addActivation({ id: "act31", set: s4, creatorId: "c14", status: "accepted", invited: "2026-09-16T10:00:00", responded: "2026-09-19T17:30:00" });
@@ -409,7 +409,7 @@ const s3 = addSet({
     ["act41", "c3", "c-beach", "Beach-day skincare, the easy way", "2026-08-25T15:00:00", 1.31],
     ["act42", "c11", "c-pump", "SPF under makeup, no pilling", "2026-08-29T15:00:00", 1.08],
     ["act43", "c9", "c-jars", "Dermatologist-approved SPF routine", "2026-09-02T15:00:00", 1.12],
-    ["act44", "c12", "p-ella", "Me pretending I always wore SPF", "2026-09-05T15:00:00", 1.35],
+    ["act44", "c12", "c-tube", "Me pretending I always wore SPF", "2026-09-05T15:00:00", 1.35],
   ] as const
 ).forEach(([id, creatorId, thumb, caption, published, perf]) => {
   const act = addActivation({ id, set: s3, creatorId, status: "accepted", invited: "2026-07-28T10:00:00", responded: "2026-07-29T10:00:00" });

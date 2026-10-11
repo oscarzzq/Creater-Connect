@@ -147,7 +147,7 @@ export function Overview() {
               return (
                 <li key={i.id}>
                   <Link href={`/business/inbox?item=${i.id}`} className="flex items-start gap-3 px-4 py-3 hover:bg-muted/40">
-                    {creator ? <CreatorPhoto creator={creator} size={28} /> : <span className="size-7 shrink-0 rounded-full bg-warning-subtle" />}
+                    {creator ? <CreatorPhoto creator={creator} size={28} /> : <span className="size-7 shrink-0 rounded-none bg-warning-subtle" />}
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-medium">{i.title}</span>
                       <span className="block truncate text-xs text-muted-foreground">{i.body}</span>
@@ -168,7 +168,7 @@ export function Overview() {
                 <Link key={c.id} href={`/business/campaigns/${c.id}`} className="block">
                   <div className="flex items-center justify-between gap-2 text-xs">
                     <span className="flex min-w-0 items-center gap-1.5">
-                      <span className="relative size-4 shrink-0 overflow-hidden rounded">
+                      <span className="relative size-4 shrink-0 overflow-hidden rounded-none">
                         <Photo src={c.promoting.image} alt="" sizes="32px" />
                       </span>
                       <span className="truncate">{c.name}</span>
@@ -177,8 +177,8 @@ export function Overview() {
                       {compact(r.views)} / {compact(r.guarantee!)}
                     </span>
                   </div>
-                  <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
-                    <div className={cn("h-full rounded-full", (r.delivery ?? 0) >= 1 ? "bg-success" : "bg-primary")} style={{ width: `${Math.min(100, (r.delivery ?? 0) * 100)}%` }} />
+                  <div className="mt-1 h-1.5 overflow-hidden rounded-none bg-muted">
+                    <div className={cn("h-full rounded-none", (r.delivery ?? 0) >= 1 ? "bg-success" : "bg-primary")} style={{ width: `${Math.min(100, (r.delivery ?? 0) * 100)}%` }} />
                   </div>
                 </Link>
               ))}

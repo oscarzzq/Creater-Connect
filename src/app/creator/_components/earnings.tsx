@@ -257,7 +257,7 @@ function Audience({ creator }: { creator: Creator }) {
       <div className="mt-4 grid gap-5 sm:grid-cols-2">
         <div>
           <div className="text-xs text-muted-foreground">Gender</div>
-          <div className="mt-2 flex h-2 overflow-hidden rounded-full" aria-hidden>
+          <div className="mt-2 flex h-2 overflow-hidden rounded-none" aria-hidden>
             <div className="bg-chart-1" style={{ width: `${femalePct}%` }} />
             <div className="w-0.5 bg-card" />
             <div className="flex-1 bg-chart-2" />
@@ -290,8 +290,8 @@ function Audience({ creator }: { creator: Creator }) {
             {ages.map(([bucket, v]) => (
               <li key={bucket} className="flex items-center gap-2 text-xs">
                 <span className="w-10 text-muted-foreground tabular-nums">{bucket}</span>
-                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden>
-                  <div className="h-full rounded-full bg-chart-1" style={{ width: `${(v / maxAge) * 100}%` }} />
+                <div className="h-1.5 flex-1 overflow-hidden rounded-none bg-muted" aria-hidden>
+                  <div className="h-full rounded-none bg-chart-1" style={{ width: `${(v / maxAge) * 100}%` }} />
                 </div>
                 <span className="w-8 text-right tabular-nums">{v}%</span>
               </li>

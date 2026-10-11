@@ -162,7 +162,7 @@ export function CreatorSheet({
             <div className="grid gap-4 rounded-xl border p-4 sm:grid-cols-2">
               <div>
                 <div className="text-xs text-muted-foreground">Gender</div>
-                <div className="mt-2 flex h-2 gap-0.5 overflow-hidden rounded-full">
+                <div className="mt-2 flex h-2 gap-0.5 overflow-hidden rounded-none">
                   <div className="bg-chart-1" style={{ width: `${creator.audience.femalePct}%` }} />
                   <div className="flex-1 bg-chart-2" />
                 </div>
@@ -196,8 +196,8 @@ export function CreatorSheet({
                   {ages.map(([bucket, v]) => (
                     <div key={bucket} className="flex items-center gap-2 text-xs">
                       <span className="w-10 text-muted-foreground tabular-nums">{bucket}</span>
-                      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
-                        <div className="h-full rounded-full bg-chart-1" style={{ width: `${(v / maxAge) * 100}%` }} />
+                      <div className="h-1.5 flex-1 overflow-hidden rounded-none bg-muted">
+                        <div className="h-full rounded-none bg-chart-1" style={{ width: `${(v / maxAge) * 100}%` }} />
                       </div>
                       <span className="w-8 text-right tabular-nums">{v}%</span>
                     </div>

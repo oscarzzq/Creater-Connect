@@ -171,8 +171,8 @@ export function AdsManager() {
       render: (x) =>
         x.r.delivery === null ? "—" : (
           <span className="flex items-center gap-2">
-            <span className="h-1.5 w-14 overflow-hidden rounded-full bg-muted">
-              <span className={cn("block h-full rounded-full", x.r.delivery >= 1 ? "bg-success" : x.stage === "make_good" ? "bg-warning" : "bg-primary")} style={{ width: `${Math.min(100, x.r.delivery * 100)}%` }} />
+            <span className="h-1.5 w-14 overflow-hidden rounded-none bg-muted">
+              <span className={cn("block h-full rounded-none", x.r.delivery >= 1 ? "bg-success" : x.stage === "make_good" ? "bg-warning" : "bg-primary")} style={{ width: `${Math.min(100, x.r.delivery * 100)}%` }} />
             </span>
             <span className="text-xs tabular-nums">{pct(x.r.delivery * 100)}</span>
           </span>
@@ -478,7 +478,7 @@ export function AdsManager() {
               setSelected={setSelPosts}
               name={(x) => (
                 <button className="flex items-center gap-2.5 text-left" onClick={() => openPost(x.p.id)}>
-                  <span className="relative h-11 w-[25px] shrink-0 overflow-hidden rounded bg-muted">
+                  <span className="relative h-11 w-[25px] shrink-0 overflow-hidden rounded-none bg-muted">
                     <Photo src={x.p.thumbnail} alt="" sizes="50px" />
                   </span>
                   <span className="min-w-0">
@@ -581,7 +581,7 @@ function FilterMenu<T extends string>({ label, options, value, onChange, icon }:
         <Button variant="outline" size="sm" className={cn("h-8 bg-card shadow-card", value.length && "border-primary/40 text-primary")}>
           {icon && <Filter />}
           {label}
-          {value.length > 0 && <span className="rounded bg-primary/10 px-1 text-[11px] tabular-nums">{value.length}</span>}
+          {value.length > 0 && <span className="rounded-none bg-primary/10 px-1 text-[11px] tabular-nums">{value.length}</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="max-h-80 w-60 overflow-y-auto p-1">

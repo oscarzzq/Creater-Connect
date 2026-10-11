@@ -64,7 +64,7 @@ function PublishForm({ post, campaign, onDone }: { post: Post; campaign: Campaig
       <ol className="space-y-2 text-sm">
         {steps.map((s, i) => (
           <li key={s} className="flex gap-2.5">
-            <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-semibold tabular-nums">{i + 1}</span>
+            <span className="flex size-5 shrink-0 items-center justify-center rounded-none bg-muted text-[11px] font-semibold tabular-nums">{i + 1}</span>
             <span className="text-foreground/85">{s}</span>
           </li>
         ))}
