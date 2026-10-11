@@ -36,16 +36,16 @@ const PASSWORD = "demo1234";
   }
 }
 
-const BUSINESS = { email: "biz@demo.test", name: "Glow Inc.", role: "business" };
+const BUSINESS = { email: "biz@creater-connect.com", name: "Glow Inc.", role: "business" };
 const CREATORS = [
-  { email: "maya@demo.test", name: "Maya Chen", niche: "beauty", followers: 182000, price_cents: 15000 },
-  { email: "jordan@demo.test", name: "Jordan Lee", niche: "fitness", followers: 95000, price_cents: 9000 },
-  { email: "sofia@demo.test", name: "Sofia Reyes", niche: "lifestyle", followers: 240000, price_cents: 22000 },
-  { email: "dev@demo.test", name: "Dev Patel", niche: "tech", followers: 120000, price_cents: 18000 },
-  { email: "ava@demo.test", name: "Ava Kim", niche: "food", followers: 67000, price_cents: 7000 },
-  { email: "liam@demo.test", name: "Liam Carter", niche: "travel", followers: 310000, price_cents: 30000 },
-  { email: "nora@demo.test", name: "Nora Ali", niche: "fashion", followers: 145000, price_cents: 16000 },
-  { email: "kai@demo.test", name: "Kai Wong", niche: "gaming", followers: 89000, price_cents: 11000 },
+  { email: "maya@creater-connect.com", name: "Maya Chen", niche: "beauty", followers: 182000, price_cents: 15000 },
+  { email: "jordan@creater-connect.com", name: "Jordan Lee", niche: "fitness", followers: 95000, price_cents: 9000 },
+  { email: "sofia@creater-connect.com", name: "Sofia Reyes", niche: "lifestyle", followers: 240000, price_cents: 22000 },
+  { email: "dev@creater-connect.com", name: "Dev Patel", niche: "tech", followers: 120000, price_cents: 18000 },
+  { email: "ava@creater-connect.com", name: "Ava Kim", niche: "food", followers: 67000, price_cents: 7000 },
+  { email: "liam@creater-connect.com", name: "Liam Carter", niche: "travel", followers: 310000, price_cents: 30000 },
+  { email: "nora@creater-connect.com", name: "Nora Ali", niche: "fashion", followers: 145000, price_cents: 16000 },
+  { email: "kai@creater-connect.com", name: "Kai Wong", niche: "gaming", followers: 89000, price_cents: 11000 },
 ];
 
 async function getAuthedClient(email) {
@@ -126,11 +126,11 @@ for (const c of CREATORS) {
   const glow = ids.camps["Glow Serum Launch"];
   const protein = ids.camps["Protein Bar Try-On"];
   const rows = [
-    { campaign_id: glow, creator_id: ids["maya@demo.test"], payout_cents: 15000, match_score: 96 },
-    { campaign_id: glow, creator_id: ids["nora@demo.test"], payout_cents: 16000, match_score: 71 },
-    { campaign_id: glow, creator_id: ids["sofia@demo.test"], payout_cents: 22000, match_score: 68, status: "accepted" },
-    { campaign_id: protein, creator_id: ids["jordan@demo.test"], payout_cents: 9000, match_score: 94 },
-    { campaign_id: protein, creator_id: ids["ava@demo.test"], payout_cents: 7000, match_score: 55, status: "rejected" },
+    { campaign_id: glow, creator_id: ids["maya@creater-connect.com"], payout_cents: 15000, match_score: 96 },
+    { campaign_id: glow, creator_id: ids["nora@creater-connect.com"], payout_cents: 16000, match_score: 71 },
+    { campaign_id: glow, creator_id: ids["sofia@creater-connect.com"], payout_cents: 22000, match_score: 68, status: "accepted" },
+    { campaign_id: protein, creator_id: ids["jordan@creater-connect.com"], payout_cents: 9000, match_score: 94 },
+    { campaign_id: protein, creator_id: ids["ava@creater-connect.com"], payout_cents: 7000, match_score: 55, status: "rejected" },
   ];
   for (const r of rows) {
     const { error } = await sb.from("offers").upsert(
@@ -143,5 +143,5 @@ for (const c of CREATORS) {
 }
 
 console.log("\nDone. Demo logins (password: demo1234):");
-console.log("  business: biz@demo.test -> /business");
-console.log("  creator:  maya@demo.test -> /creator");
+console.log("  business: biz@creater-connect.com -> /business");
+console.log("  creator:  maya@creater-connect.com -> /creator");
